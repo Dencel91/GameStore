@@ -5,7 +5,7 @@ VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductService", "ProductService\ProductService.csproj", "{BBE99894-0532-4395-863F-362EDB231882}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService", "AuthService\UserService.csproj", "{970A4775-D5FF-44CE-BE86-41E6BFB92652}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService", "UserService\UserService.csproj", "{F8832160-6E8A-C1E0-17C8-08A5783EBD52}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{BBE99894-0532-4395-863F-362EDB231882}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BBE99894-0532-4395-863F-362EDB231882}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BBE99894-0532-4395-863F-362EDB231882}.Release|Any CPU.Build.0 = Release|Any CPU
-		{970A4775-D5FF-44CE-BE86-41E6BFB92652}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{970A4775-D5FF-44CE-BE86-41E6BFB92652}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{970A4775-D5FF-44CE-BE86-41E6BFB92652}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{970A4775-D5FF-44CE-BE86-41E6BFB92652}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8832160-6E8A-C1E0-17C8-08A5783EBD52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8832160-6E8A-C1E0-17C8-08A5783EBD52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8832160-6E8A-C1E0-17C8-08A5783EBD52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8832160-6E8A-C1E0-17C8-08A5783EBD52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
