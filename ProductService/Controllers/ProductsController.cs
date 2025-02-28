@@ -12,11 +12,13 @@ public class ProductsController : ControllerBase
 {
     private readonly IProductRepo _productRepo;
     private readonly IMapper _mapper;
+    private readonly IProductToUserRepo _productToUserRepo;
 
-    public ProductsController(IProductRepo productRepo, IMapper mapper)
+    public ProductsController(IProductRepo productRepo, IProductToUserRepo productToUserRepo, IMapper mapper)
     {
         _productRepo = productRepo;
         _mapper = mapper;
+        _productToUserRepo = productToUserRepo;
     }
 
     [HttpGet(Name = "GetProducts")]
@@ -49,5 +51,13 @@ public class ProductsController : ControllerBase
         var productReadDto = _mapper.Map<ProductReadDto>(product);
 
         return CreatedAtRoute(nameof(GetProductById), new { Id = product.Id }, productReadDto);
+    }
+
+    [HttpGet]
+    [Route("GetProductsByUserId/{userId}")]
+    public ActionResult<IEnumerable<ProductReadDto>> GetProductsByUserId(int userId)
+    {
+        var products = _productToUserRepo.GetProductsByUserId(userId);
+        return Ok(_mapper.Map<IEnumerable<ProductReadDto>>(products));
     }
 }

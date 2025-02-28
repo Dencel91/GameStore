@@ -26,6 +26,13 @@ public static class DbPreparation
             new Product() { Name = "Craft", Description = "Pretty peaceful game.", Price = 50D}
         );
 
+        context.ProductToUsers.AddRange(
+            new ProductToUser() { ProductId = 1, UserId = 1 },
+            new ProductToUser() { ProductId = 2, UserId = 1 },
+            new ProductToUser() { ProductId = 3, UserId = 1 },
+            new ProductToUser() { ProductId = 1, UserId = 2 }
+        );
+
         context.SaveChanges();
     }
 }
