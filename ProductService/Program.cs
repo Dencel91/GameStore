@@ -3,7 +3,19 @@ using ProductService.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("InMem"));
+if (builder.Environment.IsDevelopment())
+{
+    Console.WriteLine("Using InMemory Database");
+    builder.Services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("InMem"));
+}
+else
+{
+    Console.WriteLine("Using SQL Server");
+    Console.WriteLine(builder.Configuration.GetConnectionString("ProductServiceConnection"));
+
+    builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ProductServiceConnection")));
+}
+
 builder.Services.AddScoped<IProductRepo, ProductRepo>();
 builder.Services.AddScoped<IProductToUserRepo, ProductToUserRepo>();
 
@@ -23,12 +35,12 @@ var app = builder.Build();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
 app.MapControllers();
 
-DbPreparation.Population(app);
+DbPreparation.Population(app, app.Environment.IsDevelopment());
 
 app.Run();

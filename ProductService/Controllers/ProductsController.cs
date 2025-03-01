@@ -57,6 +57,7 @@ public class ProductsController : ControllerBase
     [Route("GetProductsByUserId/{userId}")]
     public ActionResult<IEnumerable<ProductReadDto>> GetProductsByUserId(int userId)
     {
+        Console.WriteLine("GetProductsByUserId");
         var products = _productToUserRepo.GetProductsByUserId(userId);
         return Ok(_mapper.Map<IEnumerable<ProductReadDto>>(products));
     }

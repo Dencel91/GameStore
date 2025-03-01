@@ -21,19 +21,23 @@ public class ProductDataClient : IProductDataClient
 
     public async Task<IEnumerable<Product>> GetProductsByUserId(int id)
     {
-        
-        //var httpContent = new StringContent(JsonSerializer.Serialize(id), Encoding.UTF8, "application/json");
-
-        var response = await _httpClient.GetAsync($"{_configuration["ProductService"]}/GetProductsByUserId/{id}");
-
-        if (!response.IsSuccessStatusCode)
+        try
         {
-            throw new Exception("Cannot send product to user");
+            var response = await _httpClient.GetAsync($"{_configuration["ProductService"]}/GetProductsByUserId/{id}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception("Cannot send product to user");
+            }
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var deserialized = JsonSerializer.Deserialize<IEnumerable<Product>>(responseContent);
+
+            return deserialized;
         }
-
-        var responseContent = await response.Content.ReadAsStringAsync();
-        var deserialized = JsonSerializer.Deserialize<IEnumerable<Product>>(responseContent);
-
-        return deserialized;
+        catch (Exception ex)
+        {
+            throw new Exception("Cannot send product to user", ex);
+        }
     }
 }
