@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ProductService.Data;
 using ProductService.DTOs;
 using ProductService.Models;
+using ProductService.Services;
 
 namespace ProductService.Controllers;
 
@@ -13,12 +14,14 @@ public class ProductsController : ControllerBase
     private readonly IProductRepo _productRepo;
     private readonly IMapper _mapper;
     private readonly IProductToUserRepo _productToUserRepo;
+    private readonly IProductService _productService;
 
-    public ProductsController(IProductRepo productRepo, IProductToUserRepo productToUserRepo, IMapper mapper)
+    public ProductsController(IProductRepo productRepo, IProductToUserRepo productToUserRepo, IMapper mapper, IProductService productService)
     {
         _productRepo = productRepo;
         _mapper = mapper;
         _productToUserRepo = productToUserRepo;
+        _productService = productService;
     }
 
     [HttpGet(Name = "GetProducts")]
@@ -32,7 +35,6 @@ public class ProductsController : ControllerBase
     public ActionResult<ProductReadDto> GetProductById(int id)
     {
         var product = _productRepo.GetProductById(id);
-
         if (product is not null)
         {
             return Ok(_mapper.Map<ProductReadDto>(product));
@@ -55,10 +57,9 @@ public class ProductsController : ControllerBase
 
     [HttpGet]
     [Route("GetProductsByUserId/{userId}")]
-    public ActionResult<IEnumerable<ProductReadDto>> GetProductsByUserId(int userId)
+    public async Task<ActionResult<IEnumerable<ProductReadDto>>> GetProductsByUserId(int userId)
     {
-        Console.WriteLine("GetProductsByUserId");
-        var products = _productToUserRepo.GetProductsByUserId(userId);
+        var products = await _productService.GetProductsByUserId(userId);
         return Ok(_mapper.Map<IEnumerable<ProductReadDto>>(products));
     }
 }

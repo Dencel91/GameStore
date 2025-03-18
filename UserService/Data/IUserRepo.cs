@@ -10,5 +10,5 @@ public interface IUserRepo
 
     User GetUserById(int id);
 
-    void CreateUser(User user);
+    Task CreateUser(User user);
 }

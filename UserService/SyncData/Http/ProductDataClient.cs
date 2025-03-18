@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
@@ -27,17 +28,30 @@ public class ProductDataClient : IProductDataClient
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new Exception("Cannot send product to user");
+                Console.WriteLine("Cannot get user's products");
+                return new List<Product>();
             }
 
             var responseContent = await response.Content.ReadAsStringAsync();
+
+            if (string.IsNullOrEmpty(responseContent))
+            {
+                throw new Exception("Cannot get user's products");
+            }
+
             var deserialized = JsonSerializer.Deserialize<IEnumerable<Product>>(responseContent);
+
+            if (deserialized == null)
+            {
+                throw new Exception("Cannot get user's products");
+            }
 
             return deserialized;
         }
-        catch (Exception ex)
+        catch
         {
-            throw new Exception("Cannot send product to user", ex);
+            Console.WriteLine("Cannot get user's products");
+            return new List<Product>();
         }
     }
 }

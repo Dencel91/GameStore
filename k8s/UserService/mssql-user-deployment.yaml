@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mssql-product-deployment
+  name: mssql-user-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mssql-product
+      app: mssql-user
   template:
     metadata:
       labels:
-        app: mssql-product
+        app: mssql-user
     spec:
       containers:
-      - name: mssql-product
+      - name: mssql-user
         image: mcr.microsoft.com/mssql/server:2019-latest
         ports:
         - containerPort: 1433
@@ -22,27 +22,27 @@ spec:
           value: "Express"
         - name: ACCEPT_EULA
           value: "Y"
-        - name: SA_PASSWORD
+        - name: MSSQL_SA_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: mssql
-              key: SA_PASSWORD
+              name: user-service-connection
+              key: Password
         volumeMounts:
-        - name: mssqldb
+        - name: mssqldb-user
           mountPath: /var/opt/mssql/data
       volumes:
-      - name: mssqldb
+      - name: mssqldb-user
         persistentVolumeClaim:
-          claimName: mssql-claim
+          claimName: mssql-user-claim
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: mssql-product-clusterip-service
+  name: mssql-user-clusterip-service
 spec:
   type: ClusterIP
   selector:
-    app: mssql
+    app: mssql-user
   ports:
     - protocol: TCP
       port: 1433
@@ -51,12 +51,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: mssql-product-loadbalancer-service
+  name: mssql-user-loadbalancer-service
 spec:
   type: LoadBalancer
   selector:
-    app: mssql
+    app: mssql-user
   ports:
     - protocol: TCP
-      port: 1433
+      port: 1533
       targetPort: 1433

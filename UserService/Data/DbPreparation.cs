@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using UserService.Models;
 
 namespace UserService.Data;
@@ -15,18 +16,27 @@ public static class DbPreparation
 
     private static void SeedData(AppDbContext context)
     {
-        if (context.Users.Any())
+        try
         {
-            return;
+            context.Database.Migrate();
+
+            if (context.Users.Any())
+            {
+                return;
+            }
+
+            context.Users.AddRange(
+                new User() { UID = "123124132", Name = "Dencel", Email = "Dencel@gmail.com", Password = "test" },
+                new User() { UID = "", Name = "Brak0ne", Email = "Dencel@gmail.com", Password = "test" },
+                new User() { UID = "", Name = "Foxy", Email = "Dencel@gmail.com", Password = "test" }
+            );
+
+            context.SaveChanges();
         }
+        catch (Exception)
+        {
 
-        context.Users.AddRange(
-            new User() { UID = "", Name = "Dencel"},
-            new User() { UID = "", Name = "Brak0ne"},
-            new User() { UID = "", Name = "Foxy" }
-        );
-
-
-        context.SaveChanges();
+            throw;
+        }
     }
 }

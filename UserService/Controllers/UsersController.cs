@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using UserService.Data;
+using UserService.Dtos;
 using UserService.Models;
-using UserService.SyncData.Http;
+using UserService.Services;
 
 namespace UserService.Controllers;
 
@@ -9,20 +9,17 @@ namespace UserService.Controllers;
 [ApiController]
 public class UsersController : Controller
 {
-    private readonly IUserRepo _userRepo;
-    private readonly IProductDataClient _productClient;
+    private readonly IUserService _userService;
 
-    public UsersController(IUserRepo userRepo, IProductDataClient productClient)
+    public UsersController(IUserService userService)
     {
-        _userRepo = userRepo;
-        _productClient = productClient;
+        _userService = userService;
     }
 
-    [HttpGet]
+    [HttpGet("{id}", Name = "GetUserById")]
     public async Task<ActionResult<User>> GetUserById(int id)
     {
-        var user = _userRepo.GetUserById(id);
-        user.Products = await _productClient.GetProductsByUserId(id);
+        var user = await _userService.GetUserById(id);
 
         if (user == null)
         {
@@ -34,11 +31,9 @@ public class UsersController : Controller
 
     // POST: UserController/Create
     [HttpPost]
-    [ValidateAntiForgeryToken]
-    public ActionResult Create(User user)
+    public async Task<ActionResult> Create(CreateUserRequest createUserRequest)
     {
-        _userRepo.CreateUser(user);
-        _userRepo.SaveChanges();
+        var user = await _userService.CreateUser(createUserRequest);
 
         return CreatedAtRoute(nameof(GetUserById), new { Id = user.Id }, user);
     }

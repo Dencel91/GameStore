@@ -17,6 +17,12 @@ spec:
       containers:
       - name: user
         image: dencel2/user-service:latest
+        env:
+        - name: UserServiceConnection
+          valueFrom:
+            secretKeyRef:
+              name: user-service-connection
+              key: ConnectionString
         ports:
         - containerPort: 8080
 ---

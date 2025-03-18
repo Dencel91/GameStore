@@ -6,7 +6,7 @@ public interface IProductToUserRepo
 {
     bool SaveChanges();
 
-    IEnumerable<Product> GetProductsByUserId(int userId);
+    Task<IEnumerable<Product>> GetProductsByUserId(int userId);
 
     void AddProductToUser(int productId, int userId);
 }

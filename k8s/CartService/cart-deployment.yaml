@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cart-deployment
+  labels:
+    app: cart
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cart
+  template:
+    metadata:
+      labels:
+        app: cart
+    spec:
+      containers:
+      - name: cart
+        image: dencel2/cart-service:latest
+        env:
+        - name: RabbitMqUserName
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-secret
+              key: username
+        - name: RabbitMqPassword
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-secret
+              key: password
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cart-clusterip-service
+spec:
+  type: ClusterIP
+  selector:
+    app: cart
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080

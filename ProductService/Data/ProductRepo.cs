@@ -1,4 +1,5 @@
-﻿using ProductService.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using ProductService.Models;
 
 namespace ProductService.Data
 {
@@ -23,9 +24,9 @@ namespace ProductService.Data
             return _context.Products.ToList();
         }
 
-        public Product GetProductById(int id)
+        public Task<Product> GetProductById(int id)
         {
-            return _context.Products.FirstOrDefault(product => product.Id == id);
+            return _context.Products.FirstOrDefaultAsync(product => product.Id == id);
         }
 
         public bool SaveChanges()

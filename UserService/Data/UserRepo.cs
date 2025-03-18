@@ -11,11 +11,11 @@ public class UserRepo : IUserRepo
         _context = context;
     }
 
-    public void CreateUser(User user)
+    public async Task CreateUser(User user)
     {
         ArgumentNullException.ThrowIfNull(user);
 
-        _context.Users.Add(user);
+        await _context.Users.AddAsync(user);
     }
 
     public IEnumerable<User> GetAllUsers()

@@ -17,6 +17,22 @@ spec:
       containers:
       - name: product
         image: dencel2/product-service:latest
+        env:
+        - name: ProductServiceConnection
+          valueFrom:
+            secretKeyRef:
+              name: product-service-connection
+              key: ConnectionString
+        - name: RabbitMqUserName
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-secret
+              key: username
+        - name: RabbitMqPassword
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-secret
+              key: password
         ports:
         - containerPort: 8080
         - containerPort: 8081
@@ -38,3 +54,7 @@ spec:
       protocol: TCP
       port: 8081
       targetPort: 8081
+    - name: grpc
+      protocol: TCP
+      port: 666
+      targetPort: 666

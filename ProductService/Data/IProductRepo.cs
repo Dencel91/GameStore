@@ -8,7 +8,7 @@ public interface IProductRepo
 
     IEnumerable<Product> GetAllProducts();
 
-    Product GetProductById(int id);
+    Task<Product> GetProductById(int id);
 
     void CreateProduct(Product product);
 }

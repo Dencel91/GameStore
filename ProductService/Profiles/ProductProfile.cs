@@ -10,5 +10,6 @@ public class ProductProfile : Profile
     {
         CreateMap<Product, ProductReadDto>();
         CreateMap<ProductCreateDto, Product>();
+        CreateMap<Product, GrpcProductModel>();
     }
 }

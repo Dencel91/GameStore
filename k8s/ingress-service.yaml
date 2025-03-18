@@ -24,3 +24,10 @@ spec:
             name: user-clusterip-service
             port:
               number: 8080
+      - path: /api/carts
+        pathType: Prefix
+        backend:
+          service:
+            name: cart-clusterip-service
+            port:
+              number: 8080
