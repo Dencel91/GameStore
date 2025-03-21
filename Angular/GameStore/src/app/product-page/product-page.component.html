@@ -1,0 +1,29 @@
+@if(product){
+    <h1>{{product.name}}</h1>
+    @if (product.images && product.images.length > 0) {
+        <div class="container" style="width: 600px; margin: auto;">
+            <ngb-carousel>
+                @for(imageUrl of product.images; track imageUrl){
+                    <ng-template ngbSlide>
+                        <div class="picsum-img-wrapper">
+                            <img [src]="imageUrl" />
+                        </div>
+                    </ng-template>
+                }
+            </ngb-carousel>
+        </div>
+    }
+
+    <button type="button" class="btn btn-primary" (click)="addToCart(product.id)">Add to Cart</button>
+}
+
+<h1 *ngIf="!isLoading && !product"  class="position-absolute top-50 start-50 translate-middle">Product not found</h1>
+
+<div *ngIf="isLoading" class="position-absolute top-50 start-50 translate-middle">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+
+

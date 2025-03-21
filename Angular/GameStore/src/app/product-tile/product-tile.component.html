@@ -1,0 +1,14 @@
+
+@if (product != null) {
+    <div class="container-fluid">
+        <a routerLink="/product/{{product.id}}">
+            <img class="img-thumbnail" src={{product.thumbnailUrl}} alt={{product.name}}/>
+        </a>
+        @if(product.price === 0){
+            <p>Free</p>
+        }
+        @else {
+            <p>${{product.price}}</p>
+        }
+    </div>
+}

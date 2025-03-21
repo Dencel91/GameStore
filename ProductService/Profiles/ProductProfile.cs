@@ -8,8 +8,11 @@ public class ProductProfile : Profile
 {
     public ProductProfile()
     {
-        CreateMap<Product, ProductReadDto>();
-        CreateMap<ProductCreateDto, Product>();
+        CreateMap<Product, ProductResponse>();
+        CreateMap<CreateProductRequest, Product>();
         CreateMap<Product, GrpcProductModel>();
+        CreateMap<CreateProductReviewRequest, ProductReview>();
+        CreateMap<Product, ProductDetailsResponse>()
+            .ForMember(dist => dist.Images, opt => opt.MapFrom(product => product.Images.Select(i => i.ImageUrl)));
     }
 }

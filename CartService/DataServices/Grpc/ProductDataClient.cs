@@ -1,4 +1,5 @@
-﻿using CartService.Models;
+﻿using AutoMapper;
+using CartService.DTOs;
 using Grpc.Net.Client;
 using ProductService;
 
@@ -6,59 +7,50 @@ namespace CartService.DataServices.Grpc;
 
 public class ProductDataClient : IProductDataClient
 {
-    private readonly IConfiguration _configuration;
+    private readonly GrpcProduct.GrpcProductClient _client;
+    private readonly IMapper _mapper;
 
-    public ProductDataClient(IConfiguration configuration)
+    public ProductDataClient(GrpcProduct.GrpcProductClient client, IMapper mapper)
     {
-        _configuration = configuration;
+        _client = client;
+        _mapper = mapper;
     }
 
-    public Product GetProductById(int id)
+    public ProductDto GetProductById(int id)
     {
-        var channel = GrpcChannel.ForAddress(_configuration["GrpcConfigs:ProductServiceUrl"]);
-        var client = new GrpcProduct.GrpcProductClient(channel);
         try
         {
-            var response = client.GetProduct(new ProductRequest { Id = id });
+            var response = _client.GetProduct(new GrpcProductRequest { Id = id });
 
             if (response.Product is null)
             {
                 throw new ArgumentException("Invalid product id");
             }
 
-            return new Product
-            {
-                Id = response.Product.Id,
-                Name = response.Product.Name,
-                Price = response.Product.Price,
-                Description = response.Product.Description
-            };
+            return _mapper.Map<ProductDto>(response.Product);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"gRPC error: {ex.Message}");
-            return null;
+            throw;
         }
 
     }
 
-    public IEnumerable<Product> GetProductsByUserId(int userId)
+    public IEnumerable<ProductDto> GetProductsByUserId(int userId)
     {
-        var channel = GrpcChannel.ForAddress(_configuration["GrpcConfigs:ProductServiceUrl"]);
-        var client = new GrpcProduct.GrpcProductClient(channel);
-        var response = client.GetUserProducts(new UserProductRequest { UserId = userId });
+        var response = _client.GetUserProducts(new GrpcUserProductRequest { UserId = userId });
+        var products = _mapper.Map<IEnumerable<ProductDto>>(response.Products);
+        return products;
+    }
 
-        var products = new List<Product>();
-        foreach(var product in response.Products)
-        {
-            products.Add(new Product
-            {
-                Id = product.Id,
-                Name = product.Name,
-                Price = product.Price,
-                Description = product.Description
-            });
-        }
+    public IEnumerable<ProductDto> GetProductsByIds(IEnumerable<int> ids)
+    {
+        var request = new GetProductsByIdsGrpcRequest();
+        request.Ids.AddRange(ids);
+        var response = _client.GetProductsByIds(request);
+
+        var products = _mapper.Map<IEnumerable<ProductDto>>(response.Products);
 
         return products;
     }

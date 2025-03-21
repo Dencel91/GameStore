@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using ProductService.Data;
 using ProductService.Events;
 using ProductService.Models;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace ProductService.EventProcessing;
 

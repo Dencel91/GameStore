@@ -3,8 +3,9 @@ syntax = "proto3";
 option csharp_namespace = "ProductService";
 
 service GrpcProduct {
-  rpc GetProduct(ProductRequest) returns (ProductResponse);
-  rpc GetUserProducts(UserProductRequest) returns (UserProductResponse);
+  rpc GetProduct(GrpcProductRequest) returns (GrpcProductResponse);
+  rpc GetUserProducts(GrpcUserProductRequest) returns (GrpcUserProductResponse);
+  rpc GetProductsByIds(GetProductsByIdsGrpcRequest) returns (GetProductsByIdsGrpcResponse);
 }
 
 message GrpcProductModel {
@@ -12,20 +13,29 @@ message GrpcProductModel {
   string name = 2;
   string description = 3;
   float price = 4;
+  string thumbnailUrl = 5;
 }
 
-message ProductRequest {
+message GrpcProductRequest {
   int32 id = 1;
 }
 
-message ProductResponse {
+message GrpcProductResponse {
   GrpcProductModel product = 1;
 }
 
-message UserProductRequest {
+message GrpcUserProductRequest {
   int32 userId = 1;
 }
 
-message UserProductResponse {
+message GrpcUserProductResponse {
   repeated GrpcProductModel products = 1;
+}
+
+message GetProductsByIdsGrpcRequest {
+	repeated int32 ids = 1;
+}
+
+message GetProductsByIdsGrpcResponse {
+	repeated GrpcProductModel products = 1;
 }

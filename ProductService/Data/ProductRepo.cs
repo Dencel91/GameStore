@@ -1,37 +1,48 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProductService.Models;
 
-namespace ProductService.Data
+namespace ProductService.Data;
+
+public class ProductRepo : IProductRepo
 {
-    public class ProductRepo : IProductRepo
+    private readonly AppDbContext _context;
+
+    public ProductRepo(AppDbContext context)
     {
-        private readonly AppDbContext _context;
+        _context = context;
+    }
 
-        public ProductRepo(AppDbContext context)
-        {
-            _context = context;
-        }
+    public async Task<bool> SaveChanges()
+    {
+        var updated = await _context.SaveChangesAsync() >= 0;
+        return updated;
+    }
 
-        public void CreateProduct(Product product)
-        {
-            ArgumentNullException.ThrowIfNull(product);
+    public async Task<Product> CreateProduct(Product product)
+    {
+        await _context.Products.AddAsync(product);
+        return product;
+    }
 
-            _context.Products.Add(product);
-        }
+    public async Task<IEnumerable<Product>> GetAllProducts()
+    {
+        var products = await _context.Products.ToListAsync();
+        return products;
+    }
 
-        public IEnumerable<Product> GetAllProducts()
-        {
-            return _context.Products.ToList();
-        }
+    public Task<Product?> GetProduct(int id)
+    {
+        return _context.Products.FirstOrDefaultAsync(product => product.Id == id);
+    }
 
-        public Task<Product> GetProductById(int id)
-        {
-            return _context.Products.FirstOrDefaultAsync(product => product.Id == id);
-        }
+    public async Task<IEnumerable<Product>> GetProductsByIds(IEnumerable<int> ids)
+    {
+        var products = await _context.Products.Where(product => ids.Contains(product.Id)).ToListAsync();
+        return products;
+    }
 
-        public bool SaveChanges()
-        {
-            return _context.SaveChanges() >= 0;
-        }
+    public Task<Product?> GetProductDetails(int id)
+    {
+        return _context.Products.Include(p => p.Images.OrderBy(i => i.Order)).FirstOrDefaultAsync(p => p.Id == id);
     }
 }

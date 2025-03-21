@@ -1,15 +1,12 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿namespace OrderService.DataServices;
 
-namespace OrderService.DataServices
+public class RabbitMQSettings
 {
-    public class RabbitMQSettings
-    {
-        public required string HostName { get; set; }
+    public required string HostName { get; set; }
 
-        public int Port { get; set; }
+    public int Port { get; set; }
 
-        public required string UserName { get; set; }
+    public required string UserName { get; set; }
 
-        public required string Password { get; set; }
-    }
+    public required string Password { get; set; }
 }

@@ -1,0 +1,15 @@
+@for(product of cart.products; track product.id){
+    <div class="container">
+        <div class="row">
+            <div class="col-4">
+                <img src="{{product.thumbnailUrl}}" alt="..." style="width: 100%;">
+            </div>
+            <div class="col-8">
+                <h2>{{product.name}}</h2>
+                <p>{{product.description}}</p>
+                <p>Price: {{product.price}}</p>
+                <button type="button" class="btn btn-primary" (click)="removeFromCart(product.id)">Remove from Cart</button>
+            </div>
+        </div>
+    </div>
+}

@@ -2,7 +2,7 @@
 
 namespace ProductService.DTOs;
 
-public class ProductCreateDto
+public class CreateProductRequest
 {
     [Required]
     public required string Name { get; set; }
@@ -12,4 +12,10 @@ public class ProductCreateDto
 
     [Required]
     public double Price { get; set; }
+
+    [Required]
+    public required string ThumbnailUrl { get; set; }
+
+    [Required]
+    public required IEnumerable<string> ImageUrls { get; set; }
 }

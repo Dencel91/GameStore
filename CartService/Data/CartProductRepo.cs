@@ -12,9 +12,9 @@ public class CartProductRepo : ICartProductRepo
         _context = context;
     }
 
-    public async Task<IEnumerable<CartProduct>> GetProductsByCartId(int cartId)
+    public async Task<IEnumerable<int>> GetProductIdsByCartId(int cartId)
     {
-        return await _context.CartProducts.Where(cp => cp.CartId == cartId).ToListAsync();
+        return await _context.CartProducts.Where(cp => cp.CartId == cartId).Select(p => p.ProductId).ToListAsync();
     }
 
     public void AddProduct(CartProduct cartProduct)

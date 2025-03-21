@@ -35,20 +35,12 @@ public class CartService : ICartService
             return cart;
         }
 
-        var cartProducts = await _cartProductRepo.GetProductsByCartId(id);
+        var cartProductIds = await _cartProductRepo.GetProductIdsByCartId(id);
 
-        // TODO: call ProductService to get product info
-        var products = new List<Product>();
-        cart.Products = products;
 
-        foreach (var cartProduct in cartProducts)
-        {
-            //TODO: call one request with many ids
-            var product = _productDataClient.GetProductById(cartProduct.ProductId);
-            products.Add(product);
-        }
+        cart.Products = _productDataClient.GetProductsByIds(cartProductIds);
 
-        foreach(var product in cart.Products)
+        foreach (var product in cart.Products)
         {
             cart.TotalPrice += product.Price;
         }

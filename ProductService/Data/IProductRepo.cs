@@ -4,11 +4,15 @@ namespace ProductService.Data;
 
 public interface IProductRepo
 {
-    bool SaveChanges();
+    Task<bool> SaveChanges();
 
-    IEnumerable<Product> GetAllProducts();
+    Task<IEnumerable<Product>> GetAllProducts();
 
-    Task<Product> GetProductById(int id);
+    Task<Product?> GetProduct(int id);
 
-    void CreateProduct(Product product);
+    Task<Product> CreateProduct(Product product);
+
+    Task<IEnumerable<Product>> GetProductsByIds(IEnumerable<int> ids);
+
+    Task<Product?> GetProductDetails(int id);
 }

@@ -1,0 +1,8 @@
+.nav-link.active {
+    color: cornflowerblue;
+    text-decoration: underline;
+}
+
+/* .modal-footer {
+    justify-content: normal;
+} */

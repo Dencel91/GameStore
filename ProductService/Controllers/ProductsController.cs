@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using ProductService.Data;
 using ProductService.DTOs;
-using ProductService.Models;
 using ProductService.Services;
 
 namespace ProductService.Controllers;
@@ -11,55 +9,68 @@ namespace ProductService.Controllers;
 [ApiController]
 public class ProductsController : ControllerBase
 {
-    private readonly IProductRepo _productRepo;
-    private readonly IMapper _mapper;
-    private readonly IProductToUserRepo _productToUserRepo;
     private readonly IProductService _productService;
+    private readonly IMapper _mapper;
 
-    public ProductsController(IProductRepo productRepo, IProductToUserRepo productToUserRepo, IMapper mapper, IProductService productService)
+    public ProductsController(IProductService productService, IMapper mapper)
     {
-        _productRepo = productRepo;
-        _mapper = mapper;
-        _productToUserRepo = productToUserRepo;
         _productService = productService;
+        _mapper = mapper;
     }
 
     [HttpGet(Name = "GetProducts")]
-    public ActionResult<IEnumerable<ProductReadDto>> GetProducts()
+    public async Task<ActionResult<IEnumerable<ProductResponse>>> GetProducts()
     {
-        var products = _productRepo.GetAllProducts();
-        return Ok(_mapper.Map<IEnumerable<ProductReadDto>>(products));
+        var products = await _productService.GetAllProducts();
+        return base.Ok(_mapper.Map<IEnumerable<ProductResponse>>(products));
     }
 
     [HttpGet("{id}", Name = "GetProductById")]
-    public ActionResult<ProductReadDto> GetProductById(int id)
+    public async Task<ActionResult<ProductResponse>> GetProductById(int id)
     {
-        var product = _productRepo.GetProductById(id);
-        if (product is not null)
-        {
-            return Ok(_mapper.Map<ProductReadDto>(product));
-        }
+        var product = await _productService.GetProduct(id);
 
-        return NotFound();
+        return product is not null ? base.Ok(_mapper.Map<ProductResponse>(product)) : NotFound();
     }
 
     [HttpPost]
-    public ActionResult<ProductReadDto> CreateProduct(ProductCreateDto productDto)
+    public async Task<ActionResult<ProductResponse>> CreateProduct(CreateProductRequest createProductRequest)
     {
-        var product = _mapper.Map<Product>(productDto);
-        _productRepo.CreateProduct(product);
-        _productRepo.SaveChanges();
+        var product = await _productService.CreateProduct(createProductRequest);
+        var productResponse = _mapper.Map<ProductResponse>(product);
 
-        var productReadDto = _mapper.Map<ProductReadDto>(product);
-
-        return CreatedAtRoute(nameof(GetProductById), new { Id = product.Id }, productReadDto);
+        return CreatedAtRoute(nameof(GetProductById), new { product.Id }, productResponse);
     }
 
     [HttpGet]
     [Route("GetProductsByUserId/{userId}")]
-    public async Task<ActionResult<IEnumerable<ProductReadDto>>> GetProductsByUserId(int userId)
+    public async Task<ActionResult<IEnumerable<ProductResponse>>> GetProductsByUserId(int userId)
     {
         var products = await _productService.GetProductsByUserId(userId);
-        return Ok(_mapper.Map<IEnumerable<ProductReadDto>>(products));
+        return base.Ok(_mapper.Map<IEnumerable<ProductResponse>>(products));
+    }
+
+    [HttpPost]
+    [Route("GetProductsByIds")]
+    public async Task<ActionResult<IEnumerable<ProductResponse>>> GetProductsByIds(IEnumerable<int> Ids)
+    {
+        var products = await _productService.GetProductsByIds(Ids);
+        return base.Ok(_mapper.Map<IEnumerable<ProductResponse>>(products));
+    }
+
+    [HttpGet]
+    [Route("GetProductsDetails/{id}")]
+    public async Task<ActionResult<IEnumerable<ProductDetailsResponse>>> GetProductsDetails(int id)
+    {
+        var product = await _productService.GetProductDetails(id);
+        return product is not null ? base.Ok(_mapper.Map<ProductDetailsResponse>(product)) : NotFound();
+    }
+
+    [HttpPost]
+    [Route("AddReview")]
+    public async Task<ActionResult> CreateProductReview(CreateProductReviewRequest request)
+    {
+        var product = await _productService.CreateProductReview(request);
+        return base.Ok();
     }
 }

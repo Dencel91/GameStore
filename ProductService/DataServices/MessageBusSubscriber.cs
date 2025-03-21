@@ -97,6 +97,14 @@ public class MessageBusSubscriber : BackgroundService
             
         };
 
-        await _channel.BasicConsumeAsync(queue: _queueName, autoAck: true, consumer: consumer);
+        try
+        {
+            await _channel.BasicConsumeAsync(queue: _queueName, autoAck: true, consumer: consumer);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Cannot consume queue: {ex.Message}");
+        }
+        
     }
 }

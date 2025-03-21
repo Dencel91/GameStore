@@ -10,11 +10,23 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<Product> Products { get; set; }
+
     public DbSet<ProductToUser> ProductToUsers { get; set; }
+
+    public DbSet<ProductImage> ProductImages { get; set; }
+    public DbSet<ProductReview> ProductReviews { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ProductToUser>()
-            .HasKey(ptu => new { ptu.ProductId, ptu.UserId });
+        modelBuilder.Entity<Product>()
+            .HasMany(p => p.Images)
+            .WithOne(i => i.Product)
+            .HasForeignKey(i => i.ProductId);
+
+        modelBuilder.Entity<ProductToUser>().HasKey(ptu => new { ptu.ProductId, ptu.UserId });
+
+        modelBuilder.Entity<ProductImage>().HasKey(pi => new { pi.ProductId, pi.ImageUrl });
+
+        modelBuilder.Entity<ProductReview>().HasKey(pi => new { pi.ProductId, pi.UserId });
     }
 }

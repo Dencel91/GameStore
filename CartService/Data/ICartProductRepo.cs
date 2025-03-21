@@ -6,7 +6,7 @@ public interface ICartProductRepo
 {
     bool SaveChanges();
 
-    Task<IEnumerable<CartProduct>> GetProductsByCartId(int cartId);
+    Task<IEnumerable<int>> GetProductIdsByCartId(int cartId);
 
     void AddProduct(CartProduct cartProduct);
 

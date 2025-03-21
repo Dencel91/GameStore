@@ -1,8 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace CartService.DTOs;
 
-namespace ProductService.DTOs;
-
-public class ProductReadDto
+public class ProductDto
 {
     public int Id { get; set; }
 
@@ -11,4 +9,6 @@ public class ProductReadDto
     public required string Description { get; set; }
 
     public double Price { get; set; }
+
+    public required string ThumbnailUrl { get; set; }
 }

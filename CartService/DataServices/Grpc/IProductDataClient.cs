@@ -1,10 +1,12 @@
-﻿using CartService.Models;
+﻿using CartService.DTOs;
 
 namespace CartService.DataServices.Grpc;
 
 public interface IProductDataClient
 {
-    IEnumerable<Product> GetProductsByUserId(int userId);
+    IEnumerable<ProductDto> GetProductsByUserId(int userId);
 
-    Product GetProductById(int id);
+    ProductDto GetProductById(int id);
+
+    IEnumerable<ProductDto> GetProductsByIds(IEnumerable<int> ids);
 }

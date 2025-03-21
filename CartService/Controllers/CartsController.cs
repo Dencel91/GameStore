@@ -55,7 +55,7 @@ namespace CartService.Controllers
             } 
         }
 
-        [HttpPost]
+        [HttpDelete]
         [Route("RemoveProduct")]
         public async Task<ActionResult<Cart>> RemoveProduct([FromBody] AddProductRequest addProductRequest)
         {

@@ -1,19 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CartService.Models;
+namespace ProductService.DTOs;
 
-public class Product
+public class ProductResponse
 {
-    [Key]
-    [Required]
     public int Id { get; set; }
 
-    [Required]
     public required string Name { get; set; }
 
-    [Required]
     public required string Description { get; set; }
 
-    [Required]
     public double Price { get; set; }
+
+    public required string ThumbnailUrl { get; set; }
 }

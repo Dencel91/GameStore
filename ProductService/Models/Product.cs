@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using AutoMapper.Configuration.Annotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace ProductService.Models;
 
@@ -16,4 +17,12 @@ public class Product
 
     [Required]
     public double Price { get; set; }
+
+    [Required]
+    public required string ThumbnailUrl { get; set; }
+
+    //public IEnumerable<ProductImage>? Images { get; set; }
+    public virtual ICollection<ProductImage> Images { get; set; } = [];
+
+    public virtual ICollection<ProductReview>? Reviews { get; set; } = [];
 }
