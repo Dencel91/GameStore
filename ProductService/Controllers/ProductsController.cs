@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProductService.DTOs;
 using ProductService.Services;
@@ -33,6 +34,7 @@ public class ProductsController : ControllerBase
         return product is not null ? base.Ok(_mapper.Map<ProductResponse>(product)) : NotFound();
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult<ProductResponse>> CreateProduct(CreateProductRequest createProductRequest)
     {

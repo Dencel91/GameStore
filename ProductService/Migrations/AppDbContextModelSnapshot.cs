@@ -110,11 +110,13 @@ namespace ProductService.Migrations
 
             modelBuilder.Entity("ProductService.Models.ProductImage", b =>
                 {
-                    b.HasOne("ProductService.Models.Product", null)
+                    b.HasOne("ProductService.Models.Product", "Product")
                         .WithMany("Images")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("ProductService.Models.ProductReview", b =>

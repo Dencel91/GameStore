@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mssql-auth-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mssql-auth
+  template:
+    metadata:
+      labels:
+        app: mssql-auth
+    spec:
+      containers:
+      - name: mssql-auth
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        ports:
+        - containerPort: 1433
+        env:
+        - name: MSSQL_PID
+          value: "Express"
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: MSSQL_SA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-connection
+              key: Password
+        volumeMounts:
+        - name: mssqldb-auth
+          mountPath: /var/opt/mssql/data
+      volumes:
+      - name: mssqldb-auth
+        persistentVolumeClaim:
+          claimName: mssql-auth-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mssql-auth-clusterip-service
+spec:
+  type: ClusterIP
+  selector:
+    app: mssql-auth
+  ports:
+    - protocol: TCP
+      port: 1433
+      targetPort: 1433
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mssql-auth-loadbalancer-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: mssql-auth
+  ports:
+    - protocol: TCP
+      port: 1633
+      targetPort: 1433

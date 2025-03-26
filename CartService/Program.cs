@@ -2,7 +2,9 @@ using CartService.DataServices;
 using CartService.DataServices.Grpc;
 using CartService.Extensions;
 using CartService.Services;
-using System.Runtime.InteropServices;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +17,21 @@ builder.Services.AddScoped<ICartService, CartService.Services.CartService>();
 builder.Services.AddScoped<IProductDataClient, ProductDataClient>();
 
 builder.Services.AddSingleton<IMessageBusClient, MessageBusClient>();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(
+    options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["Authorization:Issuer"],
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["Authorization:Audience"],
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Authorization:Token"]!)),
+            ValidateLifetime = true,
+        };
+    });
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

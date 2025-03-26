@@ -2,6 +2,7 @@
 using CartService.DTOs;
 using CartService.Models;
 using CartService.Services;
+using Microsoft.AspNetCore.Authorization;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -64,6 +65,7 @@ namespace CartService.Controllers
             return Ok(cart);
         }
 
+        [Authorize]
         [HttpPost]
         [Route("StartPayment")]
         public async Task<ActionResult> StartPayment([FromBody] int cartId)
