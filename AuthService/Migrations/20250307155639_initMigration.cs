@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace UserService.Migrations
+namespace AuthService.Migrations
 {
     /// <inheritdoc />
     public partial class initMigration : Migration

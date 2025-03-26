@@ -1,7 +1,7 @@
-using UserService.Data;
-using UserService.Extensions;
-using UserService.Services;
-using UserService.SyncData.Http;
+using AuthService.Data;
+using AuthService.Extensions;
+using AuthService.Services;
+using AuthService.SyncData.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +16,7 @@ builder.AddSqlDatabase();
 builder.Environment.IsDevelopment();
 builder.Services.AddScoped<IUserRepo, UserRepo>();
 
-builder.Services.AddScoped<IUserService, UserService.Services.UserService>();   
+builder.Services.AddScoped<IAuthService, AuthService.Services.AuthService>();   
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using UserService.Models;
+using AuthService.Models;
 
-namespace UserService.Data;
+namespace AuthService.Data;
 
 public static class DbPreparation
 {
@@ -24,12 +24,6 @@ public static class DbPreparation
             {
                 return;
             }
-
-            context.Users.AddRange(
-                new User() { UID = "123124132", Name = "Dencel", Email = "Dencel@gmail.com", Password = "test" },
-                new User() { UID = "", Name = "Brak0ne", Email = "Dencel@gmail.com", Password = "test" },
-                new User() { UID = "", Name = "Foxy", Email = "Dencel@gmail.com", Password = "test" }
-            );
 
             context.SaveChanges();
         }
