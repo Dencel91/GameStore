@@ -1,6 +1,6 @@
-﻿using AuthService.Models;
+﻿using UserService.Models;
 
-namespace AuthService.Data;
+namespace UserService.Data;
 
 public interface IUserRepo
 {

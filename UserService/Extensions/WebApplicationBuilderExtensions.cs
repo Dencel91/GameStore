@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using AuthService.Data;
+using UserService.Data;
 
-namespace AuthService.Extensions;
+namespace UserService.Extensions;
 
 public static class WebApplicationBuilderExtensions
 {

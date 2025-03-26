@@ -1,16 +1,16 @@
-﻿using AuthService.Data;
-using AuthService.Dtos;
-using AuthService.Models;
-using AuthService.SyncData.Http;
+﻿using UserService.Data;
+using UserService.Dtos;
+using UserService.Models;
+using UserService.SyncData.Http;
 
-namespace AuthService.Services
+namespace UserService.Services
 {
-    public class AuthService : IAuthService
+    public class UserService : IUserService
     {
         private readonly IUserRepo _userRepo;
         private readonly IProductDataClient _productClient;
 
-        public AuthService(IUserRepo userRepo, IProductDataClient productClient)
+        public UserService(IUserRepo userRepo, IProductDataClient productClient)
         {
             _userRepo = userRepo;
             _productClient = productClient;
@@ -34,6 +34,7 @@ namespace AuthService.Services
             {
                 UID = uid.ToString(),
                 Name = createUserRequest.Name,
+                Email = createUserRequest.Email,
                 Password = createUserRequest.Password
             };
             await _userRepo.CreateUser(user);

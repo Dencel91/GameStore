@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace AuthService.Models;
+namespace UserService.Models;
 
 public class Product
 {

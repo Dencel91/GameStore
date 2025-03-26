@@ -36,6 +36,7 @@ public class ProductDataClient : IProductDataClient
             _logger.LogError("gRPC error in {methodName}: {message}", nameof(GetProductById), ex.Message);
             throw;
         }
+
     }
 
     public IEnumerable<ProductDto> GetProductsByUserId(int userId)

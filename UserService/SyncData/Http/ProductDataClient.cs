@@ -1,8 +1,8 @@
 ﻿
 using System.Text.Json;
-using AuthService.Models;
+using UserService.Models;
 
-namespace AuthService.SyncData.Http;
+namespace UserService.SyncData.Http;
 
 public class ProductDataClient : IProductDataClient
 {
