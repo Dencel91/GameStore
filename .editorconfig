@@ -2,3 +2,5 @@
 
 # IDE0290: Use primary constructor
 dotnet_diagnostic.IDE0290.severity = none
+
+dotnet_diagnostic.CS4014.severity = none

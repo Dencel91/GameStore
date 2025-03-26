@@ -11,13 +11,19 @@ public class MessageBusSubscriber : BackgroundService
     private const string PurchaseCompletedExchangeName = "PurchaseCompleted";
 
     private readonly IEventProcessor _eventProcessor;
+    private readonly ILogger<MessageBusSubscriber> _logger;
     private IConnection _connection;
     private IChannel _channel;
     private string _queueName;
 
-    public MessageBusSubscriber(IConfiguration configuration, IWebHostEnvironment environment, IEventProcessor eventProcessor)
+    public MessageBusSubscriber(
+        IConfiguration configuration,
+        IWebHostEnvironment environment,
+        IEventProcessor eventProcessor,
+        ILogger<MessageBusSubscriber> logger)
     {
         _eventProcessor = eventProcessor;
+        _logger = logger;
 
         this.InitializeMessageBus(configuration, environment).Wait();
     }
@@ -62,20 +68,15 @@ public class MessageBusSubscriber : BackgroundService
             await _channel.ExchangeDeclareAsync(PurchaseCompletedExchangeName, ExchangeType.Fanout);
             _queueName = (await _channel.QueueDeclareAsync(exclusive: false)).QueueName;
             await _channel.QueueBindAsync(_queueName, PurchaseCompletedExchangeName, "");
-
-            Console.WriteLine("Connected to Message Bus");
-
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Cannot connect to Message Bus: {ex.Message}");
+            _logger.LogError("Cannot connect to Message Bus: {message}", ex.Message);
         }
     }
 
     public void Dispose()
     {
-        Console.WriteLine("RabbitMQ disposed");
-
         if (_channel.IsOpen)
         {
             _channel.CloseAsync();
@@ -91,10 +92,9 @@ public class MessageBusSubscriber : BackgroundService
 
         consumer.ReceivedAsync += async (ch, ea) =>
         {
-            Console.WriteLine("Event received");
             var content = Encoding.UTF8.GetString(ea.Body.ToArray());
+            _logger.LogInformation("Event received: {content}", content);
             await _eventProcessor.ProcessEvent(content);
-            
         };
 
         try
@@ -103,8 +103,7 @@ public class MessageBusSubscriber : BackgroundService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Cannot consume queue: {ex.Message}");
+            _logger.LogError("Cannot consume queue: {message}", ex.Message);
         }
-        
     }
 }

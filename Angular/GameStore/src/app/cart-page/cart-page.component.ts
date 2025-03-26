@@ -1,15 +1,16 @@
 import { Component } from '@angular/core';
 import { CartService } from '../services/cart.service';
 import { Cart } from '../interfaces/cart';
+import { CartItemComponent } from "../cart-item/cart-item.component";
 
 @Component({
   selector: 'app-cart-page',
-  imports: [],
+  imports: [CartItemComponent],
   templateUrl: './cart-page.component.html',
   styleUrl: './cart-page.component.css'
 })
 export class CartPageComponent {
-  cart: Cart = {} as Cart;
+  cart: Cart | undefined;
 
   constructor(private cartService: CartService) { }
 
@@ -22,22 +23,12 @@ export class CartPageComponent {
     });
   }
 
-  removeFromCart(productId: Number) {
-    this.cartService.RemoveFromCart(productId).subscribe({
-      next: (data: Cart) => {
-        this.cart = data;
-        console.log('Product removed from cart:', data);
-      }, error: (error: any) => {
-        console.error(error);
-      }
-    });
+  handleCartUpdated(cart: Cart) {
+    console.log("handleCartUpdated");
+    this.cart = cart;
   }
 
   startPayment() {
     console.log('Payment started');
-  }
-
-  completePayment() {
-    console.log('Payment completed');
   }
 }

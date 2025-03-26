@@ -1,0 +1,22 @@
+<ng-template #content let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">{{title}}</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+      <app-cart-item [product]="product!" (cartUpdated)="handlecartUpdated($event)"></app-cart-item>
+      <!-- <form>
+        <div class="mb-3">
+          <h1>{{product!.name}}</h1>
+          <img class="img-thumbnail" src={{product!.thumbnailUrl}} alt={{product!.name}}/>
+          <button type="button" class="btn secondary" (click)="removeFromCart()">Remove</button>
+        </div>
+      </form> -->
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.close('Save click')">Continue shopping</button>
+      <button type="button" class="btn btn-outline-primary" (click)="goToCart()">
+        View my cart <span class="badge rounded-pill text-bg-primary">{{cart?.products?.length}}</span>
+      </button>
+    </div>
+  </ng-template>

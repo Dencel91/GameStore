@@ -1,1 +1,44 @@
-<p>sign-up works!</p>
+<h1>Sign up</h1>
+<br>
+<div class="container-fluid">
+    <form [formGroup]="signUpForm" (ngSubmit)="submit()">
+
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="userNameInput" placeholder="User name" formControlName="userName">
+            <label for="userNameInput">User name</label>
+        </div>
+
+        <div class="input-group">
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="passwordInput" placeholder="Password" formControlName="password">
+                <label for="passwordInput">Password</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="checkPasswordInput" placeholder="Check password" formControlName="checkPassword">
+                <label for="checkPasswordInput">Check password</label>
+            </div>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input type="email" class="form-control" id="emailInput" placeholder="Email" formControlName="email">
+            <label for="emailInput">Email address</label>
+        </div>
+
+        <div class="col-12">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="" id="AgreeCheckbox" required formControlName="agreed">
+              <label class="form-check-label" for="AgreeCheckbox">
+                Agree to terms and conditions
+              </label>
+              <div class="invalid-feedback">
+                You must agree before submitting.
+              </div>
+            </div>
+        </div>
+
+        <br>
+        <div class="col-12">
+            <button class="btn btn-primary" type="submit">Submit form</button>
+        </div>
+    </form>
+</div>

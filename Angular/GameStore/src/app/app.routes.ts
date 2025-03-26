@@ -11,6 +11,6 @@ export const routes: Routes = [
     {path: 'store', component: ProductListComponent},
     {path: 'product/:id', component: ProductPageComponent},
     {path: 'cart', component: CartPageComponent},
+    {path: 'signUp', component: SignUpComponent},
     {path: '**', component: PageNotFoundComponent},
-    {path: 'signUp', component: SignUpComponent}
 ];

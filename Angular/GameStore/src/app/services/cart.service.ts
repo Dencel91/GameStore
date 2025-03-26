@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Product } from '../interfaces/product';
 import { Cart } from '../interfaces/cart';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +26,7 @@ export class CartService {
     return this.http.get<Cart>(this.url + "/" + this.cartId);
   }
 
-  AddToCart(productId: Number) {
+  AddToCart(productId: Number): Observable<Cart> {
     let body = {
       productId: productId,
       cartId: this.cartId ?? 0
@@ -34,20 +34,29 @@ export class CartService {
 
     let requestUrl = this.url + '/AddProduct';
 
-    this.http.post(requestUrl, body).subscribe((data: any) => {
-      if(!this.cartId)
-      {
-        this.cartId = data.id;
-        console.log("Got cart id", this.cartId);
-      }
+    return this.http.post<Cart>(requestUrl, body).pipe(
+      map((cart: Cart) => {
+        if(!this.cartId)
+          {
+            this.cartId = cart.id;
+            console.log("Set cart id", this.cartId);
+          }
+    
+          console.log("Product added to cart", body);
 
-      console.log("Product added to cart", body);
-    })
+          return cart;
+      })
+    );
   }
 
   RemoveFromCart(productId: Number) : Observable<Cart> {
     const options = {body: {cartId: this.cartId, productId}};
-    return this.http.delete<Cart>(this.url + '/RemoveProduct', options);
+    return this.http.delete<Cart>(this.url + '/RemoveProduct', options).pipe(
+      map((cart: Cart) => {
+        console.log("Product removed from cart", productId, cart);
+        return cart;
+      }
+    ));
   }
 
   StartPayment() {

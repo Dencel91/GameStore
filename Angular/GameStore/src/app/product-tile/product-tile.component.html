@@ -1,14 +1,16 @@
 
-@if (product != null) {
-    <div class="container-fluid">
+@if (product) {
+    <div class="card">
         <a routerLink="/product/{{product.id}}">
-            <img class="img-thumbnail" src={{product.thumbnailUrl}} alt={{product.name}}/>
+            <img src="{{product.thumbnailUrl}}" class="card-img-top">
         </a>
-        @if(product.price === 0){
-            <p>Free</p>
-        }
-        @else {
-            <p>${{product.price}}</p>
-        }
-    </div>
+        <div>
+            @if(product.price === 0){
+                Free
+            }
+            @else {
+                ${{product.price}}
+            }
+        </div>
+      </div>
 }

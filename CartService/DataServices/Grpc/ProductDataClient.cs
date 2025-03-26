@@ -9,11 +9,13 @@ public class ProductDataClient : IProductDataClient
 {
     private readonly GrpcProduct.GrpcProductClient _client;
     private readonly IMapper _mapper;
+    private readonly ILogger _logger;
 
-    public ProductDataClient(GrpcProduct.GrpcProductClient client, IMapper mapper)
+    public ProductDataClient(GrpcProduct.GrpcProductClient client, IMapper mapper, ILogger<ProductDataClient> logger)
     {
         _client = client;
         _mapper = mapper;
+        _logger = logger;
     }
 
     public ProductDto GetProductById(int id)
@@ -31,7 +33,7 @@ public class ProductDataClient : IProductDataClient
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"gRPC error: {ex.Message}");
+            _logger.LogError("gRPC error in {methodName}: {message}", nameof(GetProductById), ex.Message);
             throw;
         }
 
@@ -39,19 +41,35 @@ public class ProductDataClient : IProductDataClient
 
     public IEnumerable<ProductDto> GetProductsByUserId(int userId)
     {
-        var response = _client.GetUserProducts(new GrpcUserProductRequest { UserId = userId });
-        var products = _mapper.Map<IEnumerable<ProductDto>>(response.Products);
-        return products;
+        try
+        {
+            var response = _client.GetUserProducts(new GrpcUserProductRequest { UserId = userId });
+            var products = _mapper.Map<IEnumerable<ProductDto>>(response.Products);
+            return products;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("gRPC error in {methodName}: {message}", nameof(GetProductsByUserId), ex.Message);
+            throw;
+        }
     }
 
     public IEnumerable<ProductDto> GetProductsByIds(IEnumerable<int> ids)
     {
-        var request = new GetProductsByIdsGrpcRequest();
-        request.Ids.AddRange(ids);
-        var response = _client.GetProductsByIds(request);
+        try
+        {
+            var request = new GetProductsByIdsGrpcRequest();
+            request.Ids.AddRange(ids);
+            var response = _client.GetProductsByIds(request);
 
-        var products = _mapper.Map<IEnumerable<ProductDto>>(response.Products);
+            var products = _mapper.Map<IEnumerable<ProductDto>>(response.Products);
 
-        return products;
+            return products;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("gRPC error in {methodName}: {message}", nameof(GetProductsByIds), ex.Message);
+            throw;
+        }
     }
 }

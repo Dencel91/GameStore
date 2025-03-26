@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using CartService.Data;
+﻿using CartService.Data;
 using CartService.DataServices;
 using CartService.Events;
 using CartService.Models;
@@ -50,6 +49,8 @@ public class CartService : ICartService
 
     public async Task<Cart> AddProduct(int cartId, int productId)
     {
+        ValidateProductId(productId);
+
         Cart cart;
         if (cartId == 0)
         {
@@ -58,13 +59,20 @@ public class CartService : ICartService
         else
         {
             cart = await _cartRepo.GetCartById(cartId);
+
             if (cart is null)
             {
                 throw new ArgumentException("Invalid cart id");
             }
+
+            var addedProducts = await _cartProductRepo.GetProductIdsByCartId(cart.Id);
+
+            if (addedProducts.Contains(productId))
+            {
+                throw new ArgumentException("Product already in cart");
+            }
         }
 
-        ValidateProductId(productId);
 
         if (cart.UserId != 0)
         {
@@ -157,7 +165,7 @@ public class CartService : ICartService
         ArgumentNullException.ThrowIfNull(nameof(cartId));
 
         var cart = await this.GetCartById(cartId);
-        //TODO send message to some service than user has bought products
+
         var purchaseCompletedEvent = new PurchaseCompletedEvent()
         {
             UserId = cart.UserId,

@@ -15,7 +15,9 @@ public static class DbPreparation
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Migration failed: {ex.Message}");
+            var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger>();
+            logger.LogError("Migration failed: {message}", ex.Message);
+            throw;
         }
     }
 }

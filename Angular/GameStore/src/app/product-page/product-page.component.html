@@ -1,21 +1,47 @@
-@if(product){
-    <h1>{{product.name}}</h1>
-    @if (product.images && product.images.length > 0) {
-        <div class="container" style="width: 600px; margin: auto;">
-            <ngb-carousel>
-                @for(imageUrl of product.images; track imageUrl){
-                    <ng-template ngbSlide>
-                        <div class="picsum-img-wrapper">
-                            <img [src]="imageUrl" />
-                        </div>
-                    </ng-template>
-                }
-            </ngb-carousel>
-        </div>
-    }
+<div class="container">
+    @if(product){
+        <h1>{{product.name}}</h1>
+        @if (product.images && product.images.length > 0) {
+            <div class="row">
+                <div class="col">
+                    <ngb-carousel style="max-width: 600px;">
+                        @for(imageUrl of product.images; track imageUrl){
+                            <ng-template ngbSlide>
+                                <div class="picsum-img-wrapper">
+                                    <img [src]="imageUrl" />
+                                </div>
+                            </ng-template>
+                        }
+                    </ngb-carousel>
+                </div>
+                <div class="col-4">
+                    <img class="img-thumbnail" src={{product.thumbnailUrl}} />
+                    <p>{{product.description}}</p>
+                    <p>Reviews: Good</p>
+                    <p>Releace date: 20.10.2016</p>
+                </div>
+            </div>
+        }
 
-    <button type="button" class="btn btn-primary" (click)="addToCart(product.id)">Add to Cart</button>
-}
+        @if(product.price > 0)
+        {
+            ${{product.price}} <button type="button" class="btn btn-primary" (click)="addToCart(product.id)">Add to Cart</button>
+        }
+        @else {
+            <button type="button" class="btn btn-primary" (click)="addToLibrary()">Add to Library</button>
+        }
+
+        <h3>Reviews:</h3>
+
+        @for(review of product.reviews; track review)
+        {
+            <p>{{review.userName}}</p>
+            <p>{{review.date}}</p>
+            <p>{{review.isRecommended}}</p>
+            <p>{{review.reviewText}}</p>
+        }
+    }
+</div>
 
 <h1 *ngIf="!isLoading && !product"  class="position-absolute top-50 start-50 translate-middle">Product not found</h1>
 
@@ -25,5 +51,4 @@
     </div>
   </div>
 
-
-
+<app-add-to-cart-modal [product]="product"></app-add-to-cart-modal>

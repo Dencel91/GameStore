@@ -8,11 +8,15 @@ namespace CartService.DataServices
     public class MessageBusClient : IMessageBusClient
     {
         private const string PurchaseCompletedExchangeName = "PurchaseCompleted";
+
+        private readonly ILogger<MessageBusClient> _logger;
         private IConnection _connection;
         private IChannel _channel;
 
-        public MessageBusClient(IConfiguration configuration, IWebHostEnvironment environment)
+        public MessageBusClient(IConfiguration configuration, IWebHostEnvironment environment, ILogger<MessageBusClient> logger)
         {
+            _logger = logger;
+
             this.SetConnection(configuration, environment).Wait();
         }
 
@@ -54,12 +58,11 @@ namespace CartService.DataServices
                 _connection = await factory.CreateConnectionAsync();
                 _channel = await _connection.CreateChannelAsync();
                 await _channel.ExchangeDeclareAsync(PurchaseCompletedExchangeName, ExchangeType.Fanout);
-                Console.WriteLine("Connected to RabbitMQ");
 
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Cannot connect to RabbitMQ: {ex.Message}");
+                _logger.LogError("Cannot connect to RabbitMQ: {message}", ex.Message);
             }
         }
 
@@ -73,8 +76,8 @@ namespace CartService.DataServices
         {
             if (!_connection.IsOpen)
             {
-                Console.WriteLine("RabbitMQ connection is closed");
-                return;
+                _logger.LogError("RabbitMQ connection is closed. Cannot send a message: {message}", message);
+                throw new InvalidOperationException($"RabbitMQ connection is closed. Cannot send a message: {message}");
             }
 
             var body = Encoding.UTF8.GetBytes(message);
@@ -84,13 +87,11 @@ namespace CartService.DataServices
                 routingKey: "",
                 body: body);
 
-            Console.WriteLine($"Message is sent: {message}");
+            _logger.LogInformation("Message is sent: {message}", message);
         }
 
         public void Dispose()
         {
-            Console.WriteLine("RabbitMQ disposed");
-
             if (_channel.IsOpen)
             {
                 _channel.CloseAsync();

@@ -2,12 +2,14 @@ using CartService.DataServices;
 using CartService.DataServices.Grpc;
 using CartService.Extensions;
 using CartService.Services;
+using System.Runtime.InteropServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.AddSqlDatabase();
 builder.AddGrpcClients();
+builder.AddLogging();
 
 builder.Services.AddScoped<ICartService, CartService.Services.CartService>();
 builder.Services.AddScoped<IProductDataClient, ProductDataClient>();

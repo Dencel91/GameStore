@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using ProductService.Data;
+﻿using ProductService.Data;
 using ProductService.Events;
 using ProductService.Models;
 using System.Text.Json;
@@ -9,53 +8,50 @@ namespace ProductService.EventProcessing;
 public class EventProcessor : IEventProcessor
 {
     private readonly IServiceScopeFactory _scopeFactory;
-    private readonly IMapper _mapper;
+    private readonly ILogger<EventProcessor> _logger;
 
     public EventProcessor(
         IServiceScopeFactory scopeFactory,
-        IMapper mapper)
+        ILogger<EventProcessor> logger)
     {
         _scopeFactory = scopeFactory;
-        _mapper = mapper;
+        _logger = logger;
     }
 
-    private EventTypes DeterminateEvent(string message)
+    private static EventTypes DeterminateEvent(string message)
     {
-        Console.WriteLine("Determining event type");
-
-        var publishedEvent = JsonSerializer.Deserialize<Event>(message);
+        var publishedEvent = JsonSerializer.Deserialize<Event>(message) ??
+            throw new ArgumentException("Can not deserialize a message", nameof(message));
 
         switch (publishedEvent.EventTypeName)
         {
             case "Purchase completed":
-                Console.WriteLine("Purchase completed event detected");
                 return EventTypes.PurchaseCompleted;
             default:
                 return EventTypes.Undetermened;
         }
     }
 
-    public Task ProcessEvent(string message)
+    public async Task ProcessEvent(string message)
     {
         var eventType = DeterminateEvent(message);
         switch (eventType)
         {
             case EventTypes.PurchaseCompleted:
-                this.AddProductsToUser(message);
+                await AddProductsToUser(message);
                 break;
             default:
-                Console.WriteLine("Event not recognized");
-                break;
+                _logger.LogError("Event is not recognized: {message}", message);
+                throw new ArgumentException($"Event is not recognized: {message}");
         }
-
-        return Task.CompletedTask;
     }
 
-    private void AddProductsToUser(string message)
+    private async Task AddProductsToUser(string message)
     {
         using var scope = _scopeFactory.CreateScope();
 
-        var purchaseCompletedEvent = JsonSerializer.Deserialize<PurchaseCompletedEvent>(message);
+        var purchaseCompletedEvent = JsonSerializer.Deserialize<PurchaseCompletedEvent>(message) ??
+            throw new ArgumentException("Can not deserialize a message", nameof(message));
 
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
@@ -63,18 +59,18 @@ public class EventProcessor : IEventProcessor
         {
             foreach (var product in purchaseCompletedEvent.Products)
             {
-                context.ProductToUsers.Add(new ProductToUser { ProductId = product.Id, UserId = purchaseCompletedEvent.UserId });
-                Console.WriteLine($"Added product {product.Id} to user {purchaseCompletedEvent.UserId}");
+                await context.ProductToUsers.AddAsync(new ProductToUser { ProductId = product.Id, UserId = purchaseCompletedEvent.UserId });
+                _logger.LogInformation("Product {productId} is added to user {userId}", product.Id, purchaseCompletedEvent.UserId);
             }
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            Console.WriteLine("Could not add products to user");
+            _logger.LogError(
+                "Could not add products to user. Message: {message}. Exception message: {exceptionMessage}",
+                message,
+                ex.Message);
         }
-        
     }
 }
-
-

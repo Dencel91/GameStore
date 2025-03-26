@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Grpc.Net.Client;
 using System.Threading.Channels;
 using ProductService;
+using System.Runtime.InteropServices;
 
 namespace CartService.Extensions;
 
@@ -42,5 +43,16 @@ public static class WebApplicationBuilderExtensions
         {
             o.Address = new Uri(productServiceAddress);
         });
+    }
+
+    public static void AddLogging(this WebApplicationBuilder builder)
+    {
+        builder.Logging.ClearProviders();
+        builder.Logging.AddConsole();
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            builder.Logging.AddEventLog(settings => settings.SourceName = "Cart Service");
+        }
     }
 }
