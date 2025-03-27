@@ -1,4 +1,4 @@
-﻿namespace CartService.DataServices;
+﻿namespace AuthService.DataServices;
 
 public class RabbitMQSettings
 {

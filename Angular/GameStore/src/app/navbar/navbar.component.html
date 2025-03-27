@@ -12,7 +12,18 @@
         <li class="nav-item">
           <a class="nav-link" aria-current="page" routerLinkActive="active" routerLink="/cart">Cart</a>
         </li>
-        <button class="nav-link" (click)="open(content)">Log in</button>
+        @if(this.authService.isLoggedIn){
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" routerLinkActive="active" routerLink="/library">Library</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" routerLinkActive="active" routerLink="/library">{{this.userService.user.name}}</a>
+          </li>
+          <button class="nav-link" (click)="logout()">Log out</button>
+        }
+        @else {
+          <button class="nav-link" (click)="showLoginModal()">Log in</button>
+        }
       </ul>
       <form class="d-flex" role="search">
         <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
@@ -22,25 +33,4 @@
   </div>
 </nav>
 
-<ng-template #content let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">Log in</h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
-  </div>
-  <div class="modal-body">
-    <form>
-      <div class="mb-3">
-        <!-- <label for="userName">Log in</label> -->
-        <!-- <div class="input-group"> -->
-          <input type="text" class="form-control" id="userName" placeholder="User name" required>
-          <br/>
-          <input type="password" class="form-control" id="password" placeholder="Password" required>
-        <!-- </div> -->
-      </div>
-    </form>
-  </div>
-  <div class="modal-footer">
-    <a routerLink="/signUp" (click)="modal.close('Save click')">Don't have an account?</a>
-    <button type="button" class="btn btn-outline-primary flex-end" (click)="modal.close('Save click')">Log in</button>
-  </div>
-</ng-template>
+<app-login-modal></app-login-modal>

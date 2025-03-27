@@ -1,9 +1,8 @@
 ﻿using CartService.Events;
 
-namespace CartService.DataServices
+namespace CartService.DataServices;
+
+public interface IMessageBusClient
 {
-    public interface IMessageBusClient
-    {
-        Task PublishPurchaseCompleted(PurchaseCompletedEvent purchaseCompletedEvent);
-    }
+    Task PublishPurchaseCompleted(PurchaseCompletedEvent purchaseCompletedEvent);
 }

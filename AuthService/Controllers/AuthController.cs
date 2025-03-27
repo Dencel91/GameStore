@@ -4,15 +4,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AuthService.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class AuthController(IAuthService authService) : Controller
     {
         [HttpPost("register")]
-        public async Task<ActionResult<UserDto>> Register([FromBody] RegisterRequest request)
+        public async Task<ActionResult<Guid>> Register([FromBody] RegisterRequest request)
         {
             try
             {
-                var user = await authService.Register(request);
-                return Ok(user);
+                var userId = await authService.Register(request);
+                return Ok(userId);
             }
             catch (ArgumentException ex)
             {

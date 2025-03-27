@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using UserService.Dtos;
 using UserService.Models;
 using UserService.Services;
@@ -16,8 +17,16 @@ public class UsersController : Controller
         _userService = userService;
     }
 
+    [Authorize]
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<User>>> GetCurrentUserInfo()
+    {
+        var user = await _userService.GetCurrentUserInfo();
+        return Ok(user);
+    }
+
     [HttpGet("{id}", Name = "GetUserById")]
-    public async Task<ActionResult<User>> GetUserById(int id)
+    public async Task<ActionResult<User>> GetUserById(Guid id)
     {
         var user = await _userService.GetUserById(id);
 
@@ -31,9 +40,9 @@ public class UsersController : Controller
 
     // POST: UserController/Create
     [HttpPost]
-    public async Task<ActionResult> Create(CreateUserRequest createUserRequest)
+    public async Task<ActionResult> Create(AddUserRequest createUserRequest)
     {
-        var user = await _userService.CreateUser(createUserRequest);
+        var user = await _userService.AddUser(createUserRequest);
 
         return CreatedAtRoute(nameof(GetUserById), new { Id = user.Id }, user);
     }

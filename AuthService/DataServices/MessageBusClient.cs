@@ -1,13 +1,13 @@
-﻿using CartService.Events;
+﻿using AuthService.Events;
 using RabbitMQ.Client;
 using System.Text;
 using System.Text.Json;
 
-namespace CartService.DataServices;
+namespace AuthService.DataServices;
 
 public class MessageBusClient : IMessageBusClient
 {
-    private const string PurchaseCompletedExchangeName = "PurchaseCompleted";
+    private const string UserRegisteredExchangeName = "UserRegistered";
 
     private readonly ILogger<MessageBusClient> _logger;
     private IConnection _connection;
@@ -57,7 +57,7 @@ public class MessageBusClient : IMessageBusClient
         {
             _connection = await factory.CreateConnectionAsync();
             _channel = await _connection.CreateChannelAsync();
-            await _channel.ExchangeDeclareAsync(PurchaseCompletedExchangeName, ExchangeType.Fanout);
+            await _channel.ExchangeDeclareAsync(UserRegisteredExchangeName, ExchangeType.Fanout);
 
         }
         catch (Exception ex)
@@ -66,9 +66,9 @@ public class MessageBusClient : IMessageBusClient
         }
     }
 
-    public Task PublishPurchaseCompleted(PurchaseCompletedEvent purchaseCompletedEvent)
+    public Task PublishUserRegistered(UserRegisteredEvent userRegisteredEvent)
     {
-        var message = JsonSerializer.Serialize(purchaseCompletedEvent);
+        var message = JsonSerializer.Serialize(userRegisteredEvent);
         return this.SendMessage(message);
     }
 
@@ -83,7 +83,7 @@ public class MessageBusClient : IMessageBusClient
         var body = Encoding.UTF8.GetBytes(message);
 
         await _channel.BasicPublishAsync(
-            exchange: PurchaseCompletedExchangeName,
+            exchange: UserRegisteredExchangeName,
             routingKey: "",
             body: body);
 

@@ -8,7 +8,7 @@ public interface IUserRepo
 
     IEnumerable<User> GetAllUsers();
 
-    User GetUserById(int id);
+    Task<User?> GetUserById(Guid id);
 
     Task CreateUser(User user);
 }

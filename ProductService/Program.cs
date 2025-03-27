@@ -22,7 +22,6 @@ builder.Services.AddScoped<IProductService, ProductService.Services.ProductServi
 builder.Services.AddGrpc();
 
 builder.Services.AddSingleton<IEventProcessor, EventProcessor>();
-
 builder.Services.AddHostedService<MessageBusSubscriber>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(

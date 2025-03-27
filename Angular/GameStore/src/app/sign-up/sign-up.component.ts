@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-sign-up',
@@ -9,15 +10,20 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 })
 export class SignUpComponent {
 
+  constructor(private authService: AuthService) { }
+
   signUpForm = new FormGroup({
     userName: new FormControl(),
     password: new FormControl(),
     checkPassword: new FormControl(),
-    email: new FormControl(),
+    // email: new FormControl(),
     agreed: new FormControl(false, [Validators.requiredTrue]),
   });
 
   submit() {
-    console.log(this.signUpForm.value);
-  }
+    this.authService.register(this.signUpForm.value.userName, this.signUpForm.value.password, this.signUpForm.value.checkPassword)
+      .subscribe(() => {
+        alert("User registered successfully!");
+      });
+  };
 }

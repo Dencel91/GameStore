@@ -1,4 +1,5 @@
-﻿using UserService.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using UserService.Models;
 
 namespace UserService.Data;
 
@@ -23,9 +24,9 @@ public class UserRepo : IUserRepo
         return _context.Users.ToList();
     }
 
-    public User GetUserById(int id)
+    public Task<User?> GetUserById(Guid id)
     {
-        return _context.Users.FirstOrDefault(user => user.Id == id);
+        return _context.Users.FirstOrDefaultAsync(user => user.Id == id);
     }
 
     public bool SaveChanges()

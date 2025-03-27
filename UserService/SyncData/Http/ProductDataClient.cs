@@ -1,6 +1,6 @@
 ﻿
 using System.Text.Json;
-using UserService.Models;
+using UserService.Dtos;
 
 namespace UserService.SyncData.Http;
 
@@ -15,7 +15,7 @@ public class ProductDataClient : IProductDataClient
         _configuration = configuration;
     }
 
-    public async Task<IEnumerable<Product>> GetProductsByUserId(int id)
+    public async Task<IEnumerable<ProductDto>> GetProductsByUserId(int id)
     {
         try
         {
@@ -24,7 +24,7 @@ public class ProductDataClient : IProductDataClient
             if (!response.IsSuccessStatusCode)
             {
                 Console.WriteLine("Cannot get user's products");
-                return new List<Product>();
+                return new List<ProductDto>();
             }
 
             var responseContent = await response.Content.ReadAsStringAsync();
@@ -34,7 +34,7 @@ public class ProductDataClient : IProductDataClient
                 throw new Exception("Cannot get user's products");
             }
 
-            var deserialized = JsonSerializer.Deserialize<IEnumerable<Product>>(responseContent);
+            var deserialized = JsonSerializer.Deserialize<IEnumerable<ProductDto>>(responseContent);
 
             if (deserialized == null)
             {
@@ -46,7 +46,7 @@ public class ProductDataClient : IProductDataClient
         catch
         {
             Console.WriteLine("Cannot get user's products");
-            return new List<Product>();
+            return new List<ProductDto>();
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using AuthService.Data;
+using AuthService.DataServices;
 using AuthService.DTOs;
+using AuthService.Events;
 using AuthService.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -11,9 +13,12 @@ using System.Text;
 
 namespace AuthService.Services;
 
-public class AuthService(IUserRepo userRepo, IConfiguration configuration) : IAuthService
+public class AuthService(
+    IUserRepo userRepo,
+    IConfiguration configuration,
+    IMessageBusClient messageBusClient) : IAuthService
 {
-    public async Task<UserDto> Register(RegisterRequest request)
+    public async Task<Guid> Register(RegisterRequest request)
     {
         await VerifyRegisterRequest(request);
 
@@ -24,12 +29,9 @@ public class AuthService(IUserRepo userRepo, IConfiguration configuration) : IAu
         await userRepo.AddUser(user);
         await userRepo.SaveChanges();
 
-        var userDto = new UserDto()
-        {
-            Id = user.Id
-        };
+        PublishUserRegistered(user);
 
-        return userDto;
+        return user.Id;
     }
 
     private async Task VerifyRegisterRequest(RegisterRequest request)
@@ -56,6 +58,15 @@ public class AuthService(IUserRepo userRepo, IConfiguration configuration) : IAu
         {
             throw new ArgumentException("User with this name already exists");
         }
+    }
+
+    private void PublishUserRegistered(User user)
+    {
+        messageBusClient.PublishUserRegistered(new UserRegisteredEvent()
+        {
+            UserId = user.Id,
+            UserName = user.Name
+        });
     }
 
     public async Task<TokenResponse> Login(LoginRequest request)

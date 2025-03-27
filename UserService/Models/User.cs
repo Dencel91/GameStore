@@ -1,19 +1,17 @@
-﻿namespace UserService.Models
+﻿using UserService.Dtos;
+
+namespace UserService.Models
 {
     public class User
     {
-        public int Id { get; set; }
-
-        public required string UID { get; set; }
-
+        public Guid Id { get; set; }
+        
         public required string Name { get; set; }
 
-        public required string Email { get; set; }
+        public string? Email { get; set; }
 
-        public required string Password { get; set; }
+        //public virtual ICollection<ProductDto> Products { get; set; } = new List<ProductDto>();
 
-        public IEnumerable<Product> Products { get; set; } = new List<Product>();
-
-        public IEnumerable<User> Friends { get; set; } = new List<User>();
+        //public virtual ICollection<User> Friends { get; set; } = new List<User>();
     }
 }

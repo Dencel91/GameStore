@@ -54,7 +54,7 @@ export class AddToCartModalComponent {
 
   handlecartUpdated(event: any) {
     this.modal?.close();
-    }
+  }
 
   goToCart(){
     this.router.navigate(['/cart']);

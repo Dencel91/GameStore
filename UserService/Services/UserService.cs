@@ -1,4 +1,5 @@
-﻿using UserService.Data;
+﻿using System.Security.Claims;
+using UserService.Data;
 using UserService.Dtos;
 using UserService.Models;
 using UserService.SyncData.Http;
@@ -9,34 +10,38 @@ namespace UserService.Services
     {
         private readonly IUserRepo _userRepo;
         private readonly IProductDataClient _productClient;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserService(IUserRepo userRepo, IProductDataClient productClient)
+        public UserService(IUserRepo userRepo, IProductDataClient productClient, IHttpContextAccessor httpContextAccessor)
         {
             _userRepo = userRepo;
             _productClient = productClient;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<User> GetUserById(int id)
+        public Task<User> GetCurrentUserInfo()
         {
-            var user = _userRepo.GetUserById(id);
-            user.Products = await _productClient.GetProductsByUserId(id);
+            //var userId = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
+            var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+            return _userRepo.GetUserById(userId);
+        }
+
+        public async Task<User> GetUserById(Guid id)
+        {
+            var user = await _userRepo.GetUserById(id);
+            //user.Products = await _productClient.GetProductsByUserId(id);
 
             return user;
         }
 
-        public async Task<User> CreateUser(CreateUserRequest createUserRequest)
+        public async Task<User> AddUser(AddUserRequest createUserRequest)
         {
-
-            Random rnd = new Random();
-            int uid = rnd.Next(100000000, 999999999);
-
             var user = new User
             {
-                UID = uid.ToString(),
-                Name = createUserRequest.Name,
-                Email = createUserRequest.Email,
-                Password = createUserRequest.Password
+                Id = createUserRequest.Id,
+                Name = createUserRequest.Name
             };
+
             await _userRepo.CreateUser(user);
             _userRepo.SaveChanges();
 

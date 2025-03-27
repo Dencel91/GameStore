@@ -5,6 +5,9 @@ namespace UserService.Services;
 
 public interface IUserService
 {
-    Task<User> GetUserById(int id);
-    Task<User> CreateUser(CreateUserRequest createUserRequest);
+    Task<User> GetCurrentUserInfo();
+
+    Task<User> GetUserById(Guid id);
+
+    Task<User> AddUser(AddUserRequest createUserRequest);
 }

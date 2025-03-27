@@ -1,9 +1,9 @@
-﻿using UserService.Models;
+﻿using UserService.Dtos;
 
 namespace UserService.SyncData.Http;
 
 public interface IProductDataClient
 {
-    Task<IEnumerable<Product>> GetProductsByUserId(int id);
+    Task<IEnumerable<ProductDto>> GetProductsByUserId(int id);
 }
  

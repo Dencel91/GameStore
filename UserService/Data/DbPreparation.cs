@@ -19,19 +19,6 @@ public static class DbPreparation
         try
         {
             context.Database.Migrate();
-
-            if (context.Users.Any())
-            {
-                return;
-            }
-
-            context.Users.AddRange(
-                new User() { UID = "123124132", Name = "Dencel", Email = "Dencel@gmail.com", Password = "test" },
-                new User() { UID = "", Name = "Brak0ne", Email = "Dencel@gmail.com", Password = "test" },
-                new User() { UID = "", Name = "Foxy", Email = "Dencel@gmail.com", Password = "test" }
-            );
-
-            context.SaveChanges();
         }
         catch (Exception)
         {
