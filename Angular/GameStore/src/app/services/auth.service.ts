@@ -7,6 +7,8 @@ import { UserService } from './user.service';
   providedIn: 'root'
 })
 export class AuthService {
+  url = 'https://dencel.com/api/auth';
+
   isLoggedIn = this.refreshToken !== '';
   // isLoggedIn = computed(() => );
 
@@ -27,7 +29,6 @@ export class AuthService {
     this.isLoggedIn = this.refreshToken !== '';
   }
 
-  url = 'https://localhost:7208/api/auth';
 
   constructor(private http: HttpClient, private userService: UserService) { }
 

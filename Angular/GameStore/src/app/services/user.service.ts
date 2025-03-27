@@ -20,11 +20,11 @@ export class UserService {
   getUserInfo() {
     const options = {
       headers: new HttpHeaders({
-      'Authorization': 'Bearer ' + localStorage.getItem('token')
-    })
-  };
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      })
+    };
 
-    this.httpClient.get(this.url + "", options).subscribe((response: any) => {
+    this.httpClient.get(this.url, options).subscribe((response: any) => {
       this.user = response;
     });
   }

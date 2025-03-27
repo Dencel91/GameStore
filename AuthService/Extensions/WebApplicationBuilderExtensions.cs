@@ -5,18 +5,18 @@ namespace AuthService.Extensions;
 
 public static class WebApplicationBuilderExtensions
 {
-    private const string ProductServiceConnectioName = "AuthServiceConnection";
+    private const string AuthServiceConnectioName = "AuthServiceConnection";
     public static void AddSqlDatabase(this WebApplicationBuilder builder)
     {
         var productServiceConnection = "";
 
         if (builder.Environment.IsDevelopment())
         {
-            productServiceConnection = builder.Configuration.GetConnectionString(ProductServiceConnectioName);
+            productServiceConnection = builder.Configuration.GetConnectionString(AuthServiceConnectioName);
         }
         else
         {
-            productServiceConnection = Environment.GetEnvironmentVariable(ProductServiceConnectioName);
+            productServiceConnection = Environment.GetEnvironmentVariable(AuthServiceConnectioName);
         }
 
         builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(productServiceConnection));

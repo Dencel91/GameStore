@@ -32,9 +32,9 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-
-    app.UseCors("Development");
 }
+
+app.UseCors("Development");
 
 app.UseHttpsRedirection();
 

@@ -49,11 +49,10 @@ public class EventProcessor : IEventProcessor
 
     private Task<User> AddUser(string message)
     {
-        using var scope = _scopeFactory.CreateScope();
-
         var userRegisteredEvent = JsonSerializer.Deserialize<UserRegisteredEvent>(message) ??
             throw new ArgumentException("Can not deserialize a message", nameof(message));
 
+        using var scope = _scopeFactory.CreateScope();
         var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
         try
