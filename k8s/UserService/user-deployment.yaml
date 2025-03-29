@@ -17,12 +17,21 @@ spec:
       containers:
       - name: user
         image: dencel2/user-service:latest
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
         env:
         - name: UserServiceConnection
           valueFrom:
             secretKeyRef:
               name: user-service-connection
               key: ConnectionString
+        - name: AuthenticationKey
+          valueFrom:
+            secretKeyRef:
+              name: authentication-key
+              key: signing-key
         ports:
         - containerPort: 8080
 ---

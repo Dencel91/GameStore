@@ -12,26 +12,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddSqlDatabase();
 builder.AddGrpcClients();
 builder.AddLogging();
+builder.AddAuthentication();
 
 builder.Services.AddScoped<ICartService, CartService.Services.CartService>();
 builder.Services.AddScoped<IProductDataClient, ProductDataClient>();
 
 builder.Services.AddSingleton<IMessageBusClient, MessageBusClient>();
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(
-    options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters()
-        {
-            ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["Authorization:Issuer"],
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["Authorization:Audience"],
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Authorization:Token"]!)),
-            ValidateLifetime = true,
-        };
-    });
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -58,8 +44,9 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseCors("Development");
 }
+
+app.UseCors("Development");
 
 app.UseHttpsRedirection();
 

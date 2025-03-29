@@ -19,17 +19,16 @@ namespace UserService.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public Task<User> GetCurrentUserInfo()
+        public Task<User> GetCurrentUser()
         {
             //var userId = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
             var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
             return _userRepo.GetUserById(userId);
         }
 
-        public async Task<User> GetUserById(Guid id)
+        public async Task<User?> GetUserById(Guid id)
         {
             var user = await _userRepo.GetUserById(id);
-            //user.Products = await _productClient.GetProductsByUserId(id);
 
             return user;
         }

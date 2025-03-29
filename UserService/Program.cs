@@ -17,6 +17,7 @@ builder.Services.AddControllers();
 builder.Services.AddHttpClient<IProductDataClient, ProductDataClient>();
 
 builder.AddSqlDatabase();
+builder.AddAuthentication();
 
 builder.Environment.IsDevelopment();
 builder.Services.AddScoped<IUserRepo, UserRepo>();
@@ -26,21 +27,6 @@ builder.Services.AddHostedService<MessageBusSubscriber>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IUserService, UserService.Services.UserService>();
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(
-    options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters()
-        {
-            ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["Authorization:Issuer"],
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["Authorization:Audience"],
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Authorization:Token"]!)),
-            ValidateLifetime = true,
-        };
-    });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -63,9 +49,9 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-
-    app.UseCors("Development");
 }
+
+app.UseCors("Development");
 
 DbPreparation.Population(app);
 

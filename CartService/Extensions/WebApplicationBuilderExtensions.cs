@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using CartService.Data;
-using Microsoft.Extensions.Configuration;
-using Grpc.Net.Client;
-using System.Threading.Channels;
 using ProductService;
 using System.Runtime.InteropServices;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace CartService.Extensions;
 
@@ -54,5 +54,29 @@ public static class WebApplicationBuilderExtensions
         {
             builder.Logging.AddEventLog(settings => settings.SourceName = "Cart Service");
         }
+    }
+
+    public static void AddAuthentication(this WebApplicationBuilder builder)
+    {
+        string signingKey = (builder.Environment.IsDevelopment()
+            ? builder.Configuration["Authentication:Key"]
+            : Environment.GetEnvironmentVariable("AuthenticationKey"))
+            ?? throw new InvalidOperationException("No authentication key");
+
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(
+            options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = builder.Configuration["Authentication:Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = builder.Configuration["Authentication:Audience"],
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey)),
+                    ValidateLifetime = true,
+                };
+            }
+        );
     }
 }

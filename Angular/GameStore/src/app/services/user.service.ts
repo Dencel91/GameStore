@@ -1,11 +1,12 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  url = "https://localhost:7153/api/users";
+  url = environment.userUrl;
 
   set user(value: any) {
     localStorage.setItem('user', JSON.stringify(value));

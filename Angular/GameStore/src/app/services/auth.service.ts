@@ -1,16 +1,15 @@
 import { HttpClient } from '@angular/common/http';
-import { computed, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Injectable } from '@angular/core';
 import { UserService } from './user.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  url = 'https://dencel.com/api/auth';
+  url = environment.authUrl;
 
   isLoggedIn = this.refreshToken !== '';
-  // isLoggedIn = computed(() => );
 
   get token(): string {
     return localStorage.getItem('token') ?? '';

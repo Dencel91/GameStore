@@ -1,16 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Product } from '../interfaces/product';
 import { Cart } from '../interfaces/cart';
 import { map, Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CartService {
-  // private url = 'https://dencel.com/api/carts';
-  private url = 'https://localhost:7055/api/carts';
-
+  private url = environment.cartUrl;
 
   get cartId(): number{
     return parseInt(localStorage.getItem("cartId") ?? "0");

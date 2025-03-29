@@ -19,9 +19,9 @@ public class UsersController : Controller
 
     [Authorize]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<User>>> GetCurrentUserInfo()
+    public async Task<ActionResult<IEnumerable<User>>> GetCurrentUser()
     {
-        var user = await _userService.GetCurrentUserInfo();
+        var user = await _userService.GetCurrentUser();
         return Ok(user);
     }
 
