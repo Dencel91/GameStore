@@ -1,14 +1,18 @@
-﻿using CartService.Models;
+﻿using CartService.DTOs;
 
 namespace CartService.Services;
 
 public interface ICartService
 {
-    Task<Cart?> GetCartById(int id);
+    Task<CartDto?> GetCartById(int id);
 
-    Task<Cart> AddProduct(int cartId, int productId);
+    Task<CartDto> AddProduct(int cartId, int productId);
 
-    Task<Cart> RemoveProduct(int cartId, int productId);
+    Task<CartDto> RemoveProduct(int cartId, int productId);
+
+    Task<CartDto> MergeCarts(int cartId);
+
+    Task<CartDto?> GetCurrentUserCart();
 
     Task StartPayment(int cartId);
 

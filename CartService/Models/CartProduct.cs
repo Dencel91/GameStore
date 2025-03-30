@@ -10,5 +10,7 @@ namespace CartService.Models
 
         [Key, Column(Order = 1)]
         public int ProductId { get; set; }
+
+        public virtual Cart Cart { get; set; }
     }
 }

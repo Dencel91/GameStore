@@ -20,7 +20,6 @@ public static class WebApplicationBuilderExtensions
             builder.Services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("InMem"));
 
             builder.Services.AddScoped<ICartRepo, CartRepo>();
-            builder.Services.AddScoped<ICartProductRepo, CartProductRepo>();
             return;
         }
         //else

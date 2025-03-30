@@ -19,7 +19,31 @@ export class CartService {
     localStorage.setItem("cartId", value.toString());
   }
 
-  constructor(private http: HttpClient, private authService: AuthService) { }
+  constructor(private http: HttpClient, private authService: AuthService) {
+
+    this.authService.loginEvent$.subscribe(isLoggedIn => {
+      if (isLoggedIn) {
+        if (this.cartId > 0) {
+          this.mergeCarts().subscribe(cart => {
+            this.cartId = cart.id;
+          });
+        }
+        else {
+          this.GetCurrentUserCart().subscribe(cart => {
+            if (cart) {
+              this.cartId = cart.id;
+            }
+          });
+        }
+      }
+      else {
+        this.cartId = 0;
+      }
+    });
+  }
+  GetCurrentUserCart() {
+    return this.http.get<Cart>(this.url);
+  }
 
   GetCart(): Observable<Cart> {
     return this.http.get<Cart>(this.url + "/" + this.cartId);
@@ -56,6 +80,10 @@ export class CartService {
         return cart;
       }
     ));
+  }
+
+  mergeCarts() : Observable<Cart> {
+    return this.http.post<Cart>(this.url + '/merge-carts', this.cartId);
   }
 
   StartPayment() {

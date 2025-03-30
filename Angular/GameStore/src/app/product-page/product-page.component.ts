@@ -4,13 +4,13 @@ import { ProductService } from '../services/product.service';
 import { Product } from '../interfaces/product';
 import { CartService } from '../services/cart.service';
 import { NgbCarouselModule } from '@ng-bootstrap/ng-bootstrap';
-import { NgIf } from '@angular/common';
+import { CommonModule, NgIf } from '@angular/common';
 import { AddToCartModalComponent } from "../add-to-cart-modal/add-to-cart-modal.component";
 import { Cart } from '../interfaces/cart';
 
 @Component({
   selector: 'app-product-page',
-  imports: [NgbCarouselModule, NgIf, AddToCartModalComponent],
+  imports: [NgbCarouselModule, NgIf, AddToCartModalComponent, CommonModule],
   templateUrl: './product-page.component.html',
   styleUrl: './product-page.component.css'
 })

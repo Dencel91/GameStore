@@ -14,6 +14,14 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Cart>()
+            .HasKey(c => c.Id);
+
+        modelBuilder.Entity<Cart>()
+            .HasMany(c => c.Products)
+            .WithOne(cp => cp.Cart)
+            .HasForeignKey(cp => cp.CartId);
+
         modelBuilder.Entity<CartProduct>()
             .HasKey(cp => new { cp.CartId, cp.ProductId });
     }

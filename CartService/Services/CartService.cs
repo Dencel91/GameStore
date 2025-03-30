@@ -4,57 +4,56 @@ using CartService.Events;
 using CartService.Models;
 using CartService.DataServices.Grpc;
 using System.Security.Claims;
+using AutoMapper;
+using CartService.DTOs;
 
 namespace CartService.Services;
 
 public class CartService : ICartService
 {
     private readonly ICartRepo _cartRepo;
-    private readonly ICartProductRepo _cartProductRepo;
     private readonly IMessageBusClient _messageBusClient;
     private readonly IProductDataClient _productDataClient;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IUserDataClient _userDataClient;
+    private readonly IMapper _mapper;
 
     public CartService(
         ICartRepo cartRepo,
-        ICartProductRepo cartProductRepo,
         IMessageBusClient messageBusClient,
         IProductDataClient productDataClient,
         IHttpContextAccessor httpContextAccessor,
-        IUserDataClient userDataClient)
+        IUserDataClient userDataClient,
+        IMapper mapper)
     {
         _cartRepo = cartRepo;
-        _cartProductRepo = cartProductRepo;
         _messageBusClient = messageBusClient;
         _productDataClient = productDataClient;
         _httpContextAccessor = httpContextAccessor;
         _userDataClient = userDataClient;
+        _mapper = mapper;
     }
 
-    public async Task<Cart?> GetCartById(int id)
+    public async Task<CartDto?> GetCartById(int id)
     {
         var cart = await _cartRepo.GetCartById(id);
 
         if (cart is null)
         {
-            return cart;
+            return null;
         }
 
-        var cartProductIds = await _cartProductRepo.GetProductIdsByCartId(id);
+        var cartDto = _mapper.Map<CartDto>(cart);
 
+        var cartProductIds = cart.Products.Select(cp => cp.ProductId);
+        cartDto.Products = _productDataClient.GetProductsByIds(cartProductIds);
 
-        cart.Products = _productDataClient.GetProductsByIds(cartProductIds);
+        cartDto.TotalPrice = cartDto.Products.Sum(p => p.Price);
 
-        foreach (var product in cart.Products)
-        {
-            cart.TotalPrice += product.Price;
-        }
-
-        return cart;
+        return cartDto;
     }
 
-    public async Task<Cart> AddProduct(int cartId, int productId)
+    public async Task<CartDto> AddProduct(int cartId, int productId)
     {
         ValidateProductId(productId);
 
@@ -72,12 +71,19 @@ public class CartService : ICartService
                 throw new ArgumentException("Invalid cart id");
             }
 
-            var addedProducts = await _cartProductRepo.GetProductIdsByCartId(cart.Id);
-
-            if (addedProducts.Contains(productId))
+            if (cart.Products.Select(p => p.ProductId).Contains(productId))
             {
                 throw new ArgumentException("Product already in cart");
             }
+        }
+
+        if (cart.UserId == Guid.Empty)
+        {
+            var userId = GetCurrentUserId();
+            if (userId != Guid.Empty)
+            {
+                cart.UserId = userId;
+            }    
         }
 
         if (cart.UserId != Guid.Empty)
@@ -91,16 +97,19 @@ public class CartService : ICartService
             ProductId = productId
         };
 
-        _cartProductRepo.AddProduct(cartProduct);
+        cart.Products.Add(cartProduct);
 
-        _cartRepo.SaveChanges();
+        await _cartRepo.SaveChanges();
 
         return await this.GetCartById(cart.Id);
     }
 
     private void ValidateProductId(int productId)
     {
-        ArgumentNullException.ThrowIfNull(productId);
+        if (productId == 0)
+        {
+            throw new ArgumentException("Invalid product id");
+        }
 
         var product = _productDataClient.GetProductById(productId);
         if (product == null)
@@ -111,7 +120,6 @@ public class CartService : ICartService
 
     private void ValidateUserProducts(Guid userId, IEnumerable<int> productIds)
     {
-        //TODO: FIX IT
         var userProducts = _userDataClient.GetUserProducts(userId);
 
         var intersects = userProducts.Select(p => p.Id).Intersect(productIds);
@@ -122,32 +130,101 @@ public class CartService : ICartService
         }
     }
 
-    public async Task<Cart> RemoveProduct(int cartId, int productId)
+    public async Task<CartDto> RemoveProduct(int cartId, int productId)
     {
-        ArgumentNullException.ThrowIfNull(cartId);
-        ArgumentNullException.ThrowIfNull(productId);
-
-        var cartExists = await _cartRepo.CartExists(cartId);
-        if (!cartExists)
+        if (cartId == 0)
         {
-            throw new ArgumentException("Invalid cart id");
+            throw new ArgumentException("Invalid cart id", nameof(cartId));
         }
 
-        var cartProduct = new CartProduct
+        if (productId == 0)
         {
-            CartId = cartId,
-            ProductId = productId
-        };
+            throw new ArgumentException("Invalid product id", nameof(productId));
+        }
 
-        _cartProductRepo.RemoveProduct(cartProduct);
+        var cart = await _cartRepo.GetCartById(cartId);
 
-        _cartRepo.SaveChanges();
+        if (cart is null)
+        {
+            throw new ArgumentException("Invalid cart id", nameof(cartId));
+        }
+
+        var product = cart.Products.FirstOrDefault(p => p.ProductId == productId);
+
+        if (product is null)
+        {
+            throw new ArgumentException("Invalid product id", nameof(productId));
+        }
+
+        cart.Products.Remove(product);
+
+        await _cartRepo.SaveChanges();
 
         return await this.GetCartById(cartId);
     }
+
+    public async Task<CartDto> MergeCarts(int cartId)
+    {
+        if (cartId == 0)
+        {
+            throw new ArgumentException("Invalid cart id", nameof(cartId));
+        }
+
+        var cart = await _cartRepo.GetCartById(cartId) ?? throw new ArgumentException("Cart not found");
+
+        var userId = GetCurrentUserId();
+        var userCart = await _cartRepo.GetCartByUserId(userId);
+
+        if (userCart is null)
+        {
+            cart.UserId = userId;
+            await _cartRepo.SaveChanges();
+            return await this.GetCartById(cartId);
+        }
+
+        var userProducts = _userDataClient.GetUserProducts(userId);
+
+        var newProductIds = cart.Products.Select(cp => cp.ProductId)
+            .Except(userProducts.Select(p => p.Id))
+            .Except(userCart.Products.Select(cp => cp.ProductId));
+
+        foreach (var productId in newProductIds)
+        {
+            userCart.Products.Add(new CartProduct() { CartId = userCart.Id, ProductId = productId });
+        }
+
+        _cartRepo.DeleteCart(cart);
+
+        await _cartRepo.SaveChanges();
+
+        return await this.GetCartById(userCart.Id);
+    }
+
+    public async Task<CartDto?> GetCurrentUserCart()
+    {
+        var userId = GetCurrentUserId();
+
+        if (userId == Guid.Empty)
+        {
+            return null;
+        }
+
+        var cart = await _cartRepo.GetCartByUserId(userId);
+
+        if (cart is null)
+        {
+            return null;
+        }
+
+        return await GetCartById(cart.Id);
+    }
+
     public async Task StartPayment(int cartId)
     {
-        ArgumentNullException.ThrowIfNull(cartId);
+        if (cartId == 0)
+        {
+            throw new ArgumentException("Invalid cart id", nameof(cartId));
+        }
 
         var cart = await this.GetCartById(cartId);
 
@@ -158,33 +235,34 @@ public class CartService : ICartService
 
         if (cart.UserId == Guid.Empty)
         {
-            //TODO redirect to auth page
             cart.UserId = GetCurrentUserId();
         }
 
         ValidateUserProducts(cart.UserId, cart.Products.Select(p => p.Id));
 
-        _cartRepo.SaveChanges();
+        await _cartRepo.SaveChanges();
     }
 
     private Guid GetCurrentUserId()
     {
         if (_httpContextAccessor.HttpContext is null)
         {
-            throw new InvalidOperationException("No HttpContext");
+            return Guid.Empty;
         }
 
         //var userId = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
 
-        string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? throw new InvalidOperationException("No Identifier found in claims");
+        string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        return Guid.Parse(userId);
+        return string.IsNullOrEmpty(userId) ? Guid.Empty : Guid.Parse(userId);
     }
 
     public async Task CompletePayment(int cartId)
     {
-        ArgumentNullException.ThrowIfNull(nameof(cartId));
+        if (cartId == 0)
+        {
+            throw new ArgumentException("Invalid cart id", nameof(cartId));
+        }
 
         var cart = await this.GetCartById(cartId);
 

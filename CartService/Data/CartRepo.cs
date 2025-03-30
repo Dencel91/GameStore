@@ -19,9 +19,14 @@ public class CartRepo : ICartRepo
         return cart;
     }
 
-    public Task<Cart> GetCartById(int id)
+    public void DeleteCart(Cart cart)
     {
-        return _context.Carts.FirstOrDefaultAsync(cart => cart.Id == id);
+        _context.Carts.Remove(cart);
+    }
+
+    public Task<Cart?> GetCartById(int id)
+    {
+        return _context.Carts.Include(c => c.Products).FirstOrDefaultAsync(cart => cart.Id == id);
     }
 
     public Task<bool> CartExists(int id)
@@ -29,8 +34,14 @@ public class CartRepo : ICartRepo
         return _context.Carts.AnyAsync(c => c.Id == id);
     }
 
-    public bool SaveChanges()
+    public Task<Cart?> GetCartByUserId(Guid userId)
     {
-        return _context.SaveChanges() >= 0;
+        return _context.Carts.Include(c => c.Products).FirstOrDefaultAsync(c => c.UserId == userId);
+    }
+
+    public async Task<bool> SaveChanges()
+    {
+        var updated = await _context.SaveChangesAsync() >= 0;
+        return updated;
     }
 }

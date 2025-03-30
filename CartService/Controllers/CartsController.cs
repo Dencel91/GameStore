@@ -19,9 +19,8 @@ namespace CartService.Controllers
             _cartService = cartService;
         }
 
-        // GET api/<CartController>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Cart>> Get(int id)
+        public async Task<ActionResult<CartDto>> Get(int id)
         {
             try
             {
@@ -40,9 +39,25 @@ namespace CartService.Controllers
             }
         }
 
+        [Authorize]
+        [HttpGet]
+        public async Task<ActionResult<CartDto?>> GetCurrentUserCart()
+        {
+            try
+            {
+                var cart = await _cartService.GetCurrentUserCart();
+
+                return Ok(cart);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         [HttpPost]
         [Route("AddProduct")]
-        public async Task<ActionResult<Cart>> AddProduct([FromBody]AddProductRequest addProductRequest)
+        public async Task<ActionResult<CartDto>> AddProduct([FromBody]AddProductRequest addProductRequest)
         {
             try
             {
@@ -58,10 +73,18 @@ namespace CartService.Controllers
 
         [HttpDelete]
         [Route("RemoveProduct")]
-        public async Task<ActionResult<Cart>> RemoveProduct([FromBody] AddProductRequest addProductRequest)
+        public async Task<ActionResult<CartDto>> RemoveProduct([FromBody] AddProductRequest addProductRequest)
         {
             var cart = await _cartService.RemoveProduct(addProductRequest.CartId, addProductRequest.ProductId);
 
+            return Ok(cart);
+        }
+
+        [Authorize]
+        [HttpPost("merge-carts")]
+        public async Task<ActionResult<CartDto>> MergeCarts([FromBody] int cartId)
+        {
+            var cart = await _cartService.MergeCarts(cartId);
             return Ok(cart);
         }
 

@@ -1,6 +1,4 @@
-﻿using CartService.DTOs;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CartService.Models;
 
@@ -10,14 +8,7 @@ public class Cart
     [Required]
     public int Id { get; set; }
 
-    //[Key]
-    //[Required]
-    //public Guid Guid { get; set; }
-
     public Guid UserId { get; set; }
 
-    [NotMapped]
-    public IEnumerable<ProductDto> Products { get; set; } = new List<ProductDto>();
-
-    public double TotalPrice { get; set; }
+    public virtual ICollection<CartProduct> Products { get; set; } = [];
 }

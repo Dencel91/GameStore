@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { UserService } from './user.service';
 import { environment } from '../../environments/environment';
-import { map, Observable } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -33,6 +33,8 @@ export class AuthService {
     return this.isLoggedIn;
   }
 
+  private loginSubject = new BehaviorSubject<boolean>(false);
+  public loginEvent$ = this.loginSubject.asObservable();
 
   constructor(private http: HttpClient, private userService: UserService) { }
 
@@ -42,6 +44,7 @@ export class AuthService {
       this.setRefreshToken(response.refreshToken);
 
       this.userService.getUserInfo();
+      this.loginSubject.next(true);
     });
   }
 
@@ -74,5 +77,7 @@ export class AuthService {
     this.token = '';
     this.setRefreshToken('');
     this.userService.user = {};
+
+    this.loginSubject.next(false);
   }
 }

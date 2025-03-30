@@ -1,11 +1,22 @@
-<div class="contaider-fluid">
+<div class="container-fluid">
     <div class="row">
         <div class="col-2">
             @for(product of products; track product) {
-                <p>{{product.name}}</p>
+                 <button class="btn btn-link" (click)="selectProduct(product)">{{product.name}}</button>
+                 <br>
             }
         </div>
         <div class="col" style="background-color: black;">
+            <div class="row">
+                <div class="col-4">
+                    <!-- <img src="{{selectedProduct?.imageUrl}}" alt="{{selectedProduct?.name}}" class="img-fluid" *ngIf="selectedProduct" /> -->
+                </div>
+                <div class="col-8">
+                    <h2>{{selectedProduct?.name}}</h2>
+                    <p>{{selectedProduct?.description}}</p>
+                </div>
+                <a routerLink="/product/{{selectedProduct?.id}}">Store page</a>
+            </div>
         </div>
     </div>
 </div>
