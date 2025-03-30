@@ -11,6 +11,11 @@ import { AuthService } from './auth.service';
 export class CartService {
   private url = environment.cartUrl;
 
+  setCart(cart: Cart) {
+    localStorage.setItem("cartId", cart.id.toString());
+    localStorage.setItem("cartItemCount", cart.products.length.toString());
+  }
+
   get cartId(): number{
     return parseInt(localStorage.getItem("cartId") ?? "0");
   }
@@ -19,8 +24,11 @@ export class CartService {
     localStorage.setItem("cartId", value.toString());
   }
 
-  constructor(private http: HttpClient, private authService: AuthService) {
+  get cartItemCount(): number {
+    return parseInt(localStorage.getItem("cartItemCount") ?? "0");
+  }
 
+  constructor(private http: HttpClient, private authService: AuthService) {
     this.authService.loginEvent$.subscribe(isLoggedIn => {
       if (isLoggedIn) {
         if (this.cartId > 0) {
@@ -41,12 +49,23 @@ export class CartService {
       }
     });
   }
-  GetCurrentUserCart() {
-    return this.http.get<Cart>(this.url);
+
+  GetCurrentUserCart(): Observable<Cart> {
+    return this.http.get<Cart>(this.url).pipe(
+      map((cart: Cart) => {
+        this.setCart(cart);
+        return cart;
+      })
+    );
   }
 
   GetCart(): Observable<Cart> {
-    return this.http.get<Cart>(this.url + "/" + this.cartId);
+    return this.http.get<Cart>(this.url + "/" + this.cartId).pipe(
+      map((cart: Cart) => {
+        this.setCart(cart);
+        return cart;
+      })
+    );
   }
 
   AddToCart(productId: Number): Observable<Cart> {
@@ -59,15 +78,14 @@ export class CartService {
 
     return this.http.post<Cart>(requestUrl, body).pipe(
       map((cart: Cart) => {
-        if(!this.cartId)
-          {
-            this.cartId = cart.id;
-            console.log("Set cart id", this.cartId);
-          }
+        // if(!this.cartId)
+        //   {
+        //     this.cartId = cart.id;
+        //     console.log("Set cart id", this.cartId);
+        //   }
+        this.setCart(cart);
     
-          console.log("Product added to cart", body);
-
-          return cart;
+        return cart;
       })
     );
   }
@@ -76,7 +94,7 @@ export class CartService {
     const options = {body: {cartId: this.cartId, productId}};
     return this.http.delete<Cart>(this.url + '/RemoveProduct', options).pipe(
       map((cart: Cart) => {
-        console.log("Product removed from cart", productId, cart);
+        this.setCart(cart);
         return cart;
       }
     ));

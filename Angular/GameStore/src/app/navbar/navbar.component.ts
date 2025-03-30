@@ -4,6 +4,7 @@ import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LoginModalComponent } from "../login-modal/login-modal.component";
 import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
+import { CartService } from '../services/cart.service';
 
 @Component({
   selector: 'app-navbar',
@@ -14,7 +15,10 @@ import { UserService } from '../services/user.service';
 export class NavbarComponent {
   @ViewChild(LoginModalComponent) loginModal!: LoginModalComponent;
   
-  constructor(public authService: AuthService, public userService: UserService) {}
+  constructor(
+    public authService: AuthService,
+    public userService: UserService,
+    public cartService: CartService) {}
 
   showLoginModal() {
 	  this.loginModal.open();
