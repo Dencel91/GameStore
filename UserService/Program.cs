@@ -1,12 +1,12 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using UserService.Data;
+using UserService.DataServices.Grpc;
 using UserService.DataServices.MessageBus;
 using UserService.DataServices.MessageBus.EventProcessing;
 using UserService.Extensions;
 using UserService.Services;
-using UserService.SyncData.Http;
+using UserService.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,9 +14,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddHttpClient<IProductDataClient, ProductDataClient>();
-
 builder.AddSqlDatabase();
+builder.AddGrpcClients();
 builder.AddAuthentication();
 
 builder.Environment.IsDevelopment();
@@ -27,10 +26,16 @@ builder.Services.AddHostedService<MessageBusSubscriber>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IUserService, UserService.Services.UserService>();
+builder.Services.AddScoped<IProductDataClient, ProductDataClient>();
+
+builder.Services.AddGrpc();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddCors(options =>
 {
@@ -60,5 +65,13 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapGrpcService<GrpcUserService>();
+
+app.MapGet("/protos/products.proto", () =>
+{
+    var file = Path.Combine(app.Environment.ContentRootPath, "Protos", "users.proto");
+    return Results.File(file, "text/plain");
+});
 
 app.Run();

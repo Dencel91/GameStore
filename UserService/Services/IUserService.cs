@@ -10,4 +10,10 @@ public interface IUserService
     Task<User?> GetUserById(Guid id);
 
     Task<User> AddUser(AddUserRequest createUserRequest);
+
+    Task<IEnumerable<ProductDto>> GetCurrentUserProducts();
+
+    Task<IEnumerable<ProductDto>> GetUserProducts(Guid userId);
+
+    Task AddProductsToUser(Guid userId, IEnumerable<int> productIds);
 }

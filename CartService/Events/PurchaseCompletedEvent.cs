@@ -5,11 +5,9 @@ namespace CartService.Events;
 
 public class PurchaseCompletedEvent
 {
-    [Required]
-    public int UserId { get; set; }
+    public Guid UserId { get; set; }
 
-    [Required]
-    public IEnumerable<ProductDto> Products { get; set; } = [];
+    public IEnumerable<int> ProductIds { get; set; } = [];
 
     [Required]
     public string EventTypeName { get; set; } = "Purchase completed";

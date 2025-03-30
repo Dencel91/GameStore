@@ -4,7 +4,6 @@ option csharp_namespace = "ProductService";
 
 service GrpcProduct {
   rpc GetProduct(GrpcProductRequest) returns (GrpcProductResponse);
-  rpc GetUserProducts(GrpcUserProductRequest) returns (GrpcUserProductResponse);
   rpc GetProductsByIds(GetProductsByIdsGrpcRequest) returns (GetProductsByIdsGrpcResponse);
 }
 
@@ -22,14 +21,6 @@ message GrpcProductRequest {
 
 message GrpcProductResponse {
   GrpcProductModel product = 1;
-}
-
-message GrpcUserProductRequest {
-  int32 userId = 1;
-}
-
-message GrpcUserProductResponse {
-  repeated GrpcProductModel products = 1;
 }
 
 message GetProductsByIdsGrpcRequest {

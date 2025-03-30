@@ -11,8 +11,6 @@ public class AppDbContext : DbContext
 
     public DbSet<Product> Products { get; set; }
 
-    public DbSet<ProductToUser> ProductToUsers { get; set; }
-
     public DbSet<ProductImage> ProductImages { get; set; }
     public DbSet<ProductReview> ProductReviews { get; set; }
 
@@ -22,8 +20,6 @@ public class AppDbContext : DbContext
             .HasMany(p => p.Images)
             .WithOne(i => i.Product)
             .HasForeignKey(i => i.ProductId);
-
-        modelBuilder.Entity<ProductToUser>().HasKey(ptu => new { ptu.ProductId, ptu.UserId });
 
         modelBuilder.Entity<ProductImage>().HasKey(pi => new { pi.ProductId, pi.ImageUrl });
 

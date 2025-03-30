@@ -25,8 +25,6 @@ public class EventProcessor : IEventProcessor
 
         switch (publishedEvent.EventTypeName)
         {
-            case "Purchase completed":
-                return EventTypes.PurchaseCompleted;
             default:
                 return EventTypes.Undetermened;
         }
@@ -37,40 +35,9 @@ public class EventProcessor : IEventProcessor
         var eventType = DeterminateEvent(message);
         switch (eventType)
         {
-            case EventTypes.PurchaseCompleted:
-                await AddProductsToUser(message);
-                break;
             default:
                 _logger.LogError("Event is not recognized: {message}", message);
                 throw new ArgumentException($"Event is not recognized: {message}");
-        }
-    }
-
-    private async Task AddProductsToUser(string message)
-    {
-        using var scope = _scopeFactory.CreateScope();
-
-        var purchaseCompletedEvent = JsonSerializer.Deserialize<PurchaseCompletedEvent>(message) ??
-            throw new ArgumentException("Can not deserialize a message", nameof(message));
-
-        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-        try
-        {
-            foreach (var product in purchaseCompletedEvent.Products)
-            {
-                await context.ProductToUsers.AddAsync(new ProductToUser { ProductId = product.Id, UserId = purchaseCompletedEvent.UserId });
-                _logger.LogInformation("Product {productId} is added to user {userId}", product.Id, purchaseCompletedEvent.UserId);
-            }
-
-            await context.SaveChangesAsync();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(
-                "Could not add products to user. Message: {message}. Exception message: {exceptionMessage}",
-                message,
-                ex.Message);
         }
     }
 }

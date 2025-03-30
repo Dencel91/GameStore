@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using CartService.DTOs;
+using UserService.Dtos;
 
-namespace CartService.Profiles;
+namespace UserService.Profiles;
 
 public class ProductProfile : Profile
 {
@@ -9,5 +9,6 @@ public class ProductProfile : Profile
     {
         CreateMap<ProductService.GrpcProductModel, ProductDto>();
         CreateMap<UserService.GrpcProductModel, ProductDto>();
+        CreateMap<ProductDto, UserService.GrpcProductModel>();
     }
 }

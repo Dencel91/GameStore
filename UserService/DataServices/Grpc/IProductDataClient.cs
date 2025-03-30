@@ -1,6 +1,6 @@
-﻿using CartService.DTOs;
+﻿using UserService.Dtos;
 
-namespace CartService.DataServices.Grpc;
+namespace UserService.DataServices.Grpc;
 
 public interface IProductDataClient
 {

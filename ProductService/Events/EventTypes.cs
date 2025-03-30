@@ -2,6 +2,5 @@
 
 enum EventTypes
 {
-    PurchaseCompleted,
     Undetermened
 }

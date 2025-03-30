@@ -1,6 +1,4 @@
-﻿using UserService.Dtos;
-
-namespace UserService.Models
+﻿namespace UserService.Models
 {
     public class User
     {
@@ -10,8 +8,6 @@ namespace UserService.Models
 
         public string? Email { get; set; }
 
-        //public virtual ICollection<ProductDto> Products { get; set; } = new List<ProductDto>();
-
-        //public virtual ICollection<User> Friends { get; set; } = new List<User>();
+        public virtual ICollection<UserProduct> Products { get; set; } = new List<UserProduct>();
     }
 }

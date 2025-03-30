@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option csharp_namespace = "UserService";
+
+service GrpcUser {
+  rpc GetUserProducts(GrpcGetUserProductRequest) returns (GrpcGetUserProductsResponse);
+}
+
+message GrpcProductModel {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  float price = 4;
+  string thumbnailUrl = 5;
+}
+
+message GrpcGetUserProductRequest {
+  string userId = 1;
+}
+
+message GrpcGetUserProductsResponse {
+	repeated GrpcProductModel products = 1;
+}

@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
-using CartService.DTOs;
+using UserService.Dtos;
 using Grpc.Net.Client;
 using ProductService;
+using UserService.Profiles;
 
-namespace CartService.DataServices.Grpc;
+namespace UserService.DataServices.Grpc;
 
 public class ProductDataClient : IProductDataClient
 {

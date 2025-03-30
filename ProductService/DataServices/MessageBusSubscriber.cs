@@ -8,8 +8,6 @@ namespace ProductService.DataServices;
 
 public class MessageBusSubscriber : BackgroundService
 {
-    private const string PurchaseCompletedExchangeName = "PurchaseCompleted";
-
     private readonly IEventProcessor _eventProcessor;
     private readonly ILogger<MessageBusSubscriber> _logger;
     private IConnection _connection;
@@ -65,9 +63,6 @@ public class MessageBusSubscriber : BackgroundService
         {
             _connection = await factory.CreateConnectionAsync();
             _channel = await _connection.CreateChannelAsync();
-            await _channel.ExchangeDeclareAsync(PurchaseCompletedExchangeName, ExchangeType.Fanout);
-            _queueName = (await _channel.QueueDeclareAsync(exclusive: false)).QueueName;
-            await _channel.QueueBindAsync(_queueName, PurchaseCompletedExchangeName, "");
         }
         catch (Exception ex)
         {

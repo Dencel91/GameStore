@@ -8,20 +8,17 @@ namespace ProductService.Services;
 public class ProductService : IProductService
 {
     private readonly IProductRepo _productRepo;
-    private readonly IProductToUserRepo _productToUserRepo;
     private readonly IProductImageRepo _productImageRepo;
     private readonly IProductReviewRepo _productReviewRepo;
     private readonly IMapper _mapper;
 
     public ProductService(
         IProductRepo productRepo,
-        IProductToUserRepo productToUserRepo,
         IProductImageRepo productImageRepo,
         IProductReviewRepo productReviewRepo,
         IMapper mapper)
     {
         _productRepo = productRepo;
-        _productToUserRepo = productToUserRepo;
         _productImageRepo = productImageRepo;
         _productReviewRepo = productReviewRepo;
         _mapper = mapper;
@@ -31,13 +28,6 @@ public class ProductService : IProductService
     {
         var products = await _productRepo.GetAllProducts();
         return products;
-    }
-
-    public Task<IEnumerable<Product>> GetProductsByUserId(int userId)
-    {
-        ArgumentNullException.ThrowIfNull(userId);
-
-        return _productToUserRepo.GetProductsByUserId(userId);
     }
 
     public Task<Product?> GetProduct(int id)

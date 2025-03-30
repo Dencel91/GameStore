@@ -14,7 +14,7 @@ public class Cart
     //[Required]
     //public Guid Guid { get; set; }
 
-    public int UserId { get; set; }
+    public Guid UserId { get; set; }
 
     [NotMapped]
     public IEnumerable<ProductDto> Products { get; set; } = new List<ProductDto>();

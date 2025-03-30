@@ -3,5 +3,6 @@
 enum EventTypes
 {
     UserRegistered,
+    PurchaseCompleted,
     Undetermened
 }

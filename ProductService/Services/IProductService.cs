@@ -7,8 +7,6 @@ public interface IProductService
 {
     Task<IEnumerable<Product>> GetAllProducts();
 
-    Task<IEnumerable<Product>> GetProductsByUserId(int userId);
-
     Task<Product?> GetProduct(int id);
 
     Task<Product> CreateProduct(CreateProductRequest request);

@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using UserService.Data;
 using UserService.DataServices.MessageBus.Events;
 using UserService.Dtos;
 using UserService.Models;
@@ -28,6 +29,8 @@ public class EventProcessor : IEventProcessor
         {
             case "User registered":
                 return EventTypes.UserRegistered;
+            case "Purchase completed":
+                return EventTypes.PurchaseCompleted;
             default:
                 return EventTypes.Undetermened;
         }
@@ -40,6 +43,9 @@ public class EventProcessor : IEventProcessor
         {
             case EventTypes.UserRegistered:
                 await AddUser(message);
+                break;
+            case EventTypes.PurchaseCompleted:
+                await AddProductsToUser(message);
                 break;
             default:
                 _logger.LogError("Event is not recognized: {message}", message);
@@ -69,6 +75,29 @@ public class EventProcessor : IEventProcessor
         {
             _logger.LogError(
                 "Could not add user. Message: {message}. Exception message: {exceptionMessage}",
+                message,
+                ex.Message);
+
+            throw;
+        }
+    }
+
+    private async Task AddProductsToUser(string message)
+    {
+        var purchaseCompletedEvent = JsonSerializer.Deserialize<PurchaseCompletedEvent>(message) ??
+            throw new ArgumentException("Can not deserialize a message", nameof(message));
+
+        using var scope = _scopeFactory.CreateScope();
+        var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+
+        try
+        {
+            await userService.AddProductsToUser(purchaseCompletedEvent.UserId, purchaseCompletedEvent.ProductIds);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                "Could not add products to user. Message: {message}. Exception message: {exceptionMessage}",
                 message,
                 ex.Message);
 

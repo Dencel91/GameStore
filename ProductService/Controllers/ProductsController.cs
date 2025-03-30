@@ -44,14 +44,6 @@ public class ProductsController : ControllerBase
         return CreatedAtRoute(nameof(GetProductById), new { product.Id }, productResponse);
     }
 
-    [HttpGet]
-    [Route("GetProductsByUserId/{userId}")]
-    public async Task<ActionResult<IEnumerable<ProductResponse>>> GetProductsByUserId(int userId)
-    {
-        var products = await _productService.GetProductsByUserId(userId);
-        return base.Ok(_mapper.Map<IEnumerable<ProductResponse>>(products));
-    }
-
     [HttpPost]
     [Route("GetProductsByIds")]
     public async Task<ActionResult<IEnumerable<ProductResponse>>> GetProductsByIds(IEnumerable<int> Ids)

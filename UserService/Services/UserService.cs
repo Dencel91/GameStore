@@ -1,8 +1,8 @@
 ﻿using System.Security.Claims;
 using UserService.Data;
+using UserService.DataServices.Grpc;
 using UserService.Dtos;
 using UserService.Models;
-using UserService.SyncData.Http;
 
 namespace UserService.Services
 {
@@ -19,11 +19,29 @@ namespace UserService.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public Task<User> GetCurrentUser()
+        public async Task<User> GetCurrentUser()
         {
+            var userId = GetCurrentUserId();
+
+            var user = await _userRepo.GetUserById(userId)
+                ?? throw new InvalidOperationException($"Current user not found: {userId}");
+
+            return user;
+        }
+
+        private Guid GetCurrentUserId()
+        {
+            if (_httpContextAccessor.HttpContext is null)
+            {
+                throw new InvalidOperationException("No HttpContext");
+            }
+
             //var userId = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
-            var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
-            return _userRepo.GetUserById(userId);
+
+            string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? throw new InvalidOperationException("No Identifier found in claims");
+
+            return Guid.Parse(userId);
         }
 
         public async Task<User?> GetUserById(Guid id)
@@ -45,6 +63,27 @@ namespace UserService.Services
             _userRepo.SaveChanges();
 
             return user;
+        }
+
+        public Task<IEnumerable<ProductDto>> GetCurrentUserProducts()
+        {
+            var userId = GetCurrentUserId();
+            return GetUserProducts(userId);
+        }
+
+        public async Task<IEnumerable<ProductDto>> GetUserProducts(Guid userId)
+        {
+            var productIds = await _userRepo.GetUserProducts(userId);
+
+            var products = _productClient.GetProductsByIds(productIds);
+
+            return products;
+        }
+
+        public async Task AddProductsToUser(Guid userId, IEnumerable<int> productIds)
+        {
+            await _userRepo.AddProductToUser(userId, productIds);
+            await _userRepo.SaveChanges();
         }
     }
 }

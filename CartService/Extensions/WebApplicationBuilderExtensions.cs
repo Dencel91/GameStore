@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using UserService;
 
 namespace CartService.Extensions;
 
@@ -42,6 +43,18 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddGrpcClient<GrpcProduct.GrpcProductClient>(o =>
         {
             o.Address = new Uri(productServiceAddress);
+        });
+
+        var userServiceAddress = builder.Configuration["GrpcConfigs:UserServiceUrl"];
+
+        if (string.IsNullOrEmpty(userServiceAddress))
+        {
+            throw new InvalidOperationException("GrpcConfigs:UsertServiceUrl is empty");
+        }
+
+        builder.Services.AddGrpcClient<GrpcUser.GrpcUserClient>(o =>
+        {
+            o.Address = new Uri(userServiceAddress);
         });
     }
 

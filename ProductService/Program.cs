@@ -11,7 +11,6 @@ builder.AddSqlDatabase();
 builder.AddAuthentication();
 
 builder.Services.AddScoped<IProductRepo, ProductRepo>();
-builder.Services.AddScoped<IProductToUserRepo, ProductToUserRepo>();
 builder.Services.AddScoped<IProductImageRepo, ProductImageRepo>();
 builder.Services.AddScoped<IProductReviewRepo, ProductReviewRepo>();
 

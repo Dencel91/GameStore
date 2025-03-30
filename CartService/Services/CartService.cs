@@ -3,6 +3,7 @@ using CartService.DataServices;
 using CartService.Events;
 using CartService.Models;
 using CartService.DataServices.Grpc;
+using System.Security.Claims;
 
 namespace CartService.Services;
 
@@ -12,24 +13,30 @@ public class CartService : ICartService
     private readonly ICartProductRepo _cartProductRepo;
     private readonly IMessageBusClient _messageBusClient;
     private readonly IProductDataClient _productDataClient;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IUserDataClient _userDataClient;
 
     public CartService(
         ICartRepo cartRepo,
         ICartProductRepo cartProductRepo,
         IMessageBusClient messageBusClient,
-        IProductDataClient productDataClient)
+        IProductDataClient productDataClient,
+        IHttpContextAccessor httpContextAccessor,
+        IUserDataClient userDataClient)
     {
         _cartRepo = cartRepo;
         _cartProductRepo = cartProductRepo;
         _messageBusClient = messageBusClient;
         _productDataClient = productDataClient;
+        _httpContextAccessor = httpContextAccessor;
+        _userDataClient = userDataClient;
     }
 
-    public async Task<Cart> GetCartById(int id)
+    public async Task<Cart?> GetCartById(int id)
     {
         var cart = await _cartRepo.GetCartById(id);
 
-        if (cart == null)
+        if (cart is null)
         {
             return cart;
         }
@@ -73,8 +80,7 @@ public class CartService : ICartService
             }
         }
 
-
-        if (cart.UserId != 0)
+        if (cart.UserId != Guid.Empty)
         {
             ValidateUserProducts(cart.UserId, [productId]);
         }
@@ -103,9 +109,10 @@ public class CartService : ICartService
         }
     }
 
-    private void ValidateUserProducts(int userId, IEnumerable<int> productIds)
+    private void ValidateUserProducts(Guid userId, IEnumerable<int> productIds)
     {
-        var userProducts = _productDataClient.GetProductsByUserId(userId);
+        //TODO: FIX IT
+        var userProducts = _userDataClient.GetUserProducts(userId);
 
         var intersects = userProducts.Select(p => p.Id).Intersect(productIds);
 
@@ -149,15 +156,30 @@ public class CartService : ICartService
             throw new ArgumentException("Cart not found");
         }
 
-        if (cart.UserId == 0)
+        if (cart.UserId == Guid.Empty)
         {
             //TODO redirect to auth page
-            cart.UserId = 1;
+            cart.UserId = GetCurrentUserId();
         }
 
         ValidateUserProducts(cart.UserId, cart.Products.Select(p => p.Id));
 
         _cartRepo.SaveChanges();
+    }
+
+    private Guid GetCurrentUserId()
+    {
+        if (_httpContextAccessor.HttpContext is null)
+        {
+            throw new InvalidOperationException("No HttpContext");
+        }
+
+        //var userId = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
+
+        string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? throw new InvalidOperationException("No Identifier found in claims");
+
+        return Guid.Parse(userId);
     }
 
     public async Task CompletePayment(int cartId)
@@ -169,7 +191,7 @@ public class CartService : ICartService
         var purchaseCompletedEvent = new PurchaseCompletedEvent()
         {
             UserId = cart.UserId,
-            Products = cart.Products,
+            ProductIds = cart.Products.Select(p => p.Id),
         };
 
         _messageBusClient.PublishPurchaseCompleted(purchaseCompletedEvent);

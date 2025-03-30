@@ -29,8 +29,31 @@ public class UserRepo : IUserRepo
         return _context.Users.FirstOrDefaultAsync(user => user.Id == id);
     }
 
-    public bool SaveChanges()
+    public async Task<IEnumerable<int>> GetUserProducts(Guid UserId)
     {
-        return _context.SaveChanges() >= 0;
+        var productRequest = _context.UserProducts
+            .Where(up => up.UserId == UserId)
+            .Select(up => up.ProductId);
+
+        var products = await productRequest.ToListAsync();
+
+        return products;
+    }
+
+    public Task AddProductToUser(Guid userId, IEnumerable<int> productIds)
+    {
+        var userProducts = productIds.Select(productId => new UserProduct
+        {
+            UserId = userId,
+            ProductId = productId
+        });
+
+        return _context.UserProducts.AddRangeAsync(userProducts);
+    }
+
+    public async Task<bool> SaveChanges()
+    {
+        var updated = await _context.SaveChangesAsync() >= 0;
+        return updated;
     }
 }

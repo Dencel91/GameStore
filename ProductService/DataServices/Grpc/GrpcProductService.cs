@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Grpc.Core;
-using ProductService.Data;
 using ProductService.Services;
 
 namespace ProductService.DataServices.Grpc;
@@ -21,14 +20,6 @@ public class GrpcProductService : GrpcProduct.GrpcProductBase
         var product = await _productService.GetProduct(request.Id);
         var productResponse = new GrpcProductResponse() { Product = _mapper.Map<GrpcProductModel>(product) };
         return productResponse;
-    }
-
-    public override async Task<GrpcUserProductResponse> GetUserProducts(GrpcUserProductRequest request, ServerCallContext context)
-    {
-        var products = await _productService.GetProductsByUserId(request.UserId);
-        var response = new GrpcUserProductResponse();
-        response.Products.AddRange(_mapper.Map<IEnumerable<GrpcProductModel>>(products));
-        return response;
     }
 
     public override async Task<GetProductsByIdsGrpcResponse> GetProductsByIds(GetProductsByIdsGrpcRequest request, ServerCallContext context)

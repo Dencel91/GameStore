@@ -11,7 +11,15 @@ public class AppDbContext : DbContext
 
     public DbSet<User> Users { get; set; }
 
+    public DbSet<UserProduct> UserProducts { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<User>()
+            .HasMany(u => u.Products)
+            .WithOne(ptu => ptu.User)
+            .HasForeignKey(ptu => ptu.UserId);
+
+        modelBuilder.Entity<UserProduct>().HasKey(ptu => new { ptu.UserId, ptu.ProductId });
     }
 }

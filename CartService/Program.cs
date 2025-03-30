@@ -2,9 +2,6 @@ using CartService.DataServices;
 using CartService.DataServices.Grpc;
 using CartService.Extensions;
 using CartService.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,9 +13,11 @@ builder.AddAuthentication();
 
 builder.Services.AddScoped<ICartService, CartService.Services.CartService>();
 builder.Services.AddScoped<IProductDataClient, ProductDataClient>();
+builder.Services.AddScoped<IUserDataClient, UserDataClient>();
 
 builder.Services.AddSingleton<IMessageBusClient, MessageBusClient>();
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
