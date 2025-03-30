@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Cart } from '../interfaces/cart';
 import { map, Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,7 @@ export class CartService {
     localStorage.setItem("cartId", value.toString());
   }
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private authService: AuthService) { }
 
   GetCart(): Observable<Cart> {
     return this.http.get<Cart>(this.url + "/" + this.cartId);

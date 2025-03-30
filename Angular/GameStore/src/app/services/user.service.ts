@@ -1,6 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
+import { Product } from '../interfaces/product';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -28,5 +30,9 @@ export class UserService {
     this.httpClient.get(this.url, options).subscribe((response: any) => {
       this.user = response;
     });
+  }
+
+  getUserProducts() : Observable<Product[]> {
+    return this.httpClient.get<Product[]>(this.url + '/products');
   }
 }

@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { UserService } from './user.service';
 import { environment } from '../../environments/environment';
+import { map, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ import { environment } from '../../environments/environment';
 export class AuthService {
   url = environment.authUrl;
 
-  isLoggedIn = this.refreshToken !== '';
+  isLoggedIn = this.getRefreshToken() !== '';
 
   get token(): string {
     return localStorage.getItem('token') ?? '';
@@ -19,13 +20,17 @@ export class AuthService {
     localStorage.setItem('token', value);
   }
 
-  get refreshToken(): string {
+  getRefreshToken(): string {
     return localStorage.getItem('refreshToken') ?? '';
   }
 
-  set refreshToken(value: string) {
+  setRefreshToken(value: string) {
     localStorage.setItem('refreshToken', value);
-    this.isLoggedIn = this.refreshToken !== '';
+    this.isLoggedIn = value !== '';
+  }
+
+  isAuthenticated(): boolean {
+    return this.isLoggedIn;
   }
 
 
@@ -34,10 +39,24 @@ export class AuthService {
   login(username: string, password: string) {
     this.http.post(this.url + '/login', {username, password}).subscribe((response: any) => {
       this.token = response.accessToken;
-      this.refreshToken = response.refreshToken;
+      this.setRefreshToken(response.refreshToken);
 
       this.userService.getUserInfo();
     });
+  }
+
+  refreshToken() : Observable<any> {
+    const request = {
+      userId: this.userService.user.id,
+      RefreshToken: this.getRefreshToken()
+    };
+
+    return this.http.post(this.url + '/refresh-token', request).pipe(
+      map((response: any) => {
+        this.token = response.accessToken;
+        this.setRefreshToken(response.refreshToken);
+        return response;
+      }));
   }
 
   register(username: string, password: string, verifyPassword: string) {
@@ -53,7 +72,7 @@ export class AuthService {
 
   logout() {
     this.token = '';
-    this.refreshToken = '';
+    this.setRefreshToken('');
     this.userService.user = {};
   }
 }

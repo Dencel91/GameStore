@@ -26,7 +26,7 @@ public class UsersController : Controller
     }
 
     [Authorize]
-    [HttpGet("api/[controller]/products")]
+    [HttpGet("products")]
     public async Task<ActionResult<IEnumerable<ProductDto>>> GetCurrentUserProducts()
     {
         var products = await _userService.GetCurrentUserProducts();

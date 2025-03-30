@@ -4,6 +4,9 @@ import { ProductPageComponent } from './product-page/product-page.component';
 import { CartPageComponent } from './cart-page/cart-page.component';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 import { SignUpComponent } from './sign-up/sign-up.component';
+import { LibraryPageComponent } from './library-page/library-page.component';
+import { ProfilePageComponent } from './profile-page/profile-page.component';
+import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
     {path: '', redirectTo: 'store', pathMatch: 'full'},
@@ -12,5 +15,7 @@ export const routes: Routes = [
     {path: 'product/:id', component: ProductPageComponent},
     {path: 'cart', component: CartPageComponent},
     {path: 'signUp', component: SignUpComponent},
+    {path: 'library', component: LibraryPageComponent, canActivate: [AuthGuard]},
+    {path: 'profile', component: ProfilePageComponent, canActivate: [AuthGuard]},
     {path: '**', component: PageNotFoundComponent},
 ];
