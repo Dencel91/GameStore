@@ -33,13 +33,13 @@ public class UsersController : Controller
         return Ok(products);
     }
 
-    //[Authorize]
-    //[HttpGet("hasproduct/{productId}")]
-    //public async Task<ActionResult<bool>> HasProduct(Guid productId)
-    //{
-    //    var hasProduct = await _userService.HasProduct(productId);
-    //    return Ok(hasProduct);
-    //}
+    [Authorize]
+    [HttpGet("products/{productId}")]
+    public async Task<ActionResult<GetUserProductInfoResponse>> GetUserProductInfo(int productId)
+    {
+        var productInfo = await _userService.GetUserProductInfo(productId);
+        return Ok(productInfo);
+    }
 
     [HttpGet("{id}", Name = "GetUserById")]
     public async Task<ActionResult<User>> GetUserById(Guid id)

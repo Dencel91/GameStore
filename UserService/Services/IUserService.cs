@@ -16,4 +16,6 @@ public interface IUserService
     Task<IEnumerable<ProductDto>> GetUserProducts(Guid userId);
 
     Task AddProductsToUser(Guid userId, IEnumerable<int> productIds);
+
+    Task<GetUserProductInfoResponse> GetUserProductInfo(int productId);
 }

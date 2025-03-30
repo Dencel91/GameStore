@@ -7,6 +7,8 @@ import { NgbCarouselModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule, NgIf } from '@angular/common';
 import { AddToCartModalComponent } from "../add-to-cart-modal/add-to-cart-modal.component";
 import { Cart } from '../interfaces/cart';
+import { AuthService } from '../services/auth.service';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-product-page',
@@ -19,11 +21,14 @@ export class ProductPageComponent {
 
   isLoading: boolean = true;
   product: Product | null = null;
+  userProductInfo: any = null;
 
   constructor(
     private route: ActivatedRoute,
     private productService: ProductService,
-    private cartService: CartService) {}
+    private cartService: CartService,
+    public authService: AuthService,
+    private userService: UserService) {}
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
@@ -37,7 +42,14 @@ export class ProductPageComponent {
         error: (error: any) => {
           console.log('Cannot get product details', error);
           this.isLoading = false;
-        }});
+        }
+      });
+
+      if (this.authService.isAuthenticated()) {
+        this.userService.getUserProductInfo(id).subscribe((response: any) => {
+          this.userProductInfo = response;
+        });
+      }
     });
   }
 

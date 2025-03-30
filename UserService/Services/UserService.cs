@@ -85,5 +85,18 @@ namespace UserService.Services
             await _userRepo.AddProductToUser(userId, productIds);
             await _userRepo.SaveChanges();
         }
+
+        public async Task<GetUserProductInfoResponse> GetUserProductInfo(int productId)
+        {
+            var response = new GetUserProductInfoResponse();
+
+            var userId = GetCurrentUserId();
+
+            var products = await _userRepo.GetUserProducts(userId);
+
+            response.Owned = products.Contains(productId);
+
+            return response;
+        }
     }
 }

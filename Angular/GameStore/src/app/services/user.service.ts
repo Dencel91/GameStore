@@ -35,4 +35,8 @@ export class UserService {
   getUserProducts() : Observable<Product[]> {
     return this.httpClient.get<Product[]>(this.url + '/products');
   }
+
+  getUserProductInfo(productId: number) : Observable<any> {
+    return this.httpClient.get(this.url + '/products/' + productId);
+  }
 }
