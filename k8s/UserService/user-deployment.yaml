@@ -32,6 +32,16 @@ spec:
             secretKeyRef:
               name: authentication-key
               key: signing-key
+        - name: RabbitMqUserName
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-secret
+              key: username
+        - name: RabbitMqPassword
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-secret
+              key: password
         ports:
         - containerPort: 8080
 ---
