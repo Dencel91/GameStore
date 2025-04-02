@@ -1,49 +1,14 @@
 <div class="container text-center">
     <div class="row">
-      <div class="col">
-        <app-product-tile [product]="products[0]"></app-product-tile>
-      </div>
-      <div class="col">
-        <app-product-tile [product]="products[1]"></app-product-tile>
-      </div>
-      <div class="col">
-        <app-product-tile [product]="products[2]"></app-product-tile>
-      </div>
-    </div>
-    <br>
-    <div class="row">
-        <div class="col">
-          <app-product-tile [product]="products[3]"></app-product-tile>
+      @for(product of products; track product.id) {
+        <div class="col-6 col-lg-4 mt-3">
+          <app-product-tile [product]="product"/>
         </div>
-        <div class="col">
-          <app-product-tile [product]="products[4]"></app-product-tile>
-        </div>
-        <div class="col">
-          <app-product-tile [product]="products[5]"></app-product-tile>
-        </div>
+      }
+
       </div>
       @if (!allProductsLoaded) {
         <br>
         <button type="button" class="btn btn-primary btn-lg btn-block" (click)="getProducts()">Load More</button>
       }
   </div>
-
-<!-- <div class="container">
-<nav aria-label="Page navigation example">
-    <ul class="pagination justify-content-center">
-      <li class="page-item">
-        <a class="page-link" href="#" aria-label="Previous">
-          <span aria-hidden="true">&laquo;</span>
-        </a>
-      </li>
-      <li class="page-item"><a class="page-link" href="#">1</a></li>
-      <li class="page-item"><a class="page-link" href="#">2</a></li>
-      <li class="page-item"><a class="page-link" href="#">3</a></li>
-      <li class="page-item">
-        <a class="page-link" href="#" aria-label="Next">
-          <span aria-hidden="true">&raquo;</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
-</div> -->

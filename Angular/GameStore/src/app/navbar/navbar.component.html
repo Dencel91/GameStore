@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
+<nav class="navbar navbar-expand-md bg-body-tertiary">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">GameStore</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -11,8 +11,12 @@
         </li>
         @if(this.authService.isLoggedIn) {
           @if(this.authService.isAdmin()) {
-            <button class="nav-link" (click)="showAdminPanel()">Admin</button>
-            <button class="nav-link" (click)="logout()">Log out</button>
+            <li class="nav-item">
+              <button class="nav-link" (click)="showAdminPanel()">Admin</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" (click)="logout()">Log out</button>
+            </li>
           } @else {
             <li class="nav-item">
               <a class="nav-link" aria-current="page" routerLinkActive="active" routerLink="/cart">
@@ -37,7 +41,17 @@
           }
         }
         @else {
-          <button class="nav-link" (click)="showLoginModal()">Log in</button>
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" routerLinkActive="active" routerLink="/cart">
+              Cart
+              @if(this.cartService!.cartItemCount > 0) {
+                <span class="badge rounded-pill text-bg-primary">{{this.cartService!.cartItemCount}}</span>
+              }
+            </a>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" (click)="showLoginModal()">Log in</button>
+          </li>
         }
       </ul>
       <form class="d-flex" role="search">
