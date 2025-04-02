@@ -20,7 +20,8 @@ export class NavbarComponent {
   constructor(
     public authService: AuthService,
     public userService: UserService,
-    public cartService: CartService) {}
+    public cartService: CartService,
+    private router: Router) { }
 
   showLoginModal() {
 	  this.loginModal.open();
@@ -28,6 +29,7 @@ export class NavbarComponent {
 
   logout() {
     this.authService.logout();
+    this.router.navigate(['/']);
   }
 
   showAdminPanel() {

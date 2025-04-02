@@ -17,10 +17,12 @@ export class CartPageComponent {
   ngOnInit() {
     console.log('Cart page loaded');
 
-    this.cartService.GetCart().subscribe((data: Cart) => {
-      console.log('Cart items:', data);
-      this.cart = data;
-    });
+    if (this.cartService.cartId) {
+      this.cartService.GetCart().subscribe((data: Cart) => {
+        console.log('Cart items:', data);
+        this.cart = data;
+      });
+    }
   }
 
   handleCartUpdated(cart: Cart) {

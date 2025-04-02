@@ -23,20 +23,15 @@
             </div>
         }
 
-        @if(!this.authService.isAuthenticated() || !this.userProductInfo.owned){
-            @if(product.price > 0)
-            {
+        @if(!this.authService.isAuthenticated() || !this.userProductInfo?.owned){
+            @if(product.price > 0) {
                 {{product.price | currency}} <button type="button" class="btn btn-primary" (click)="addToCart(product.id)">Add to Cart</button>
-            }
-            @else {
+            } @else {
                 <button type="button" class="btn btn-primary" (click)="addToLibrary()">Add to Library</button>
             }  
-        }
-        @else {
+        } @else {
             <h2>Already in your library!</h2>
         }
-
-
 
         <h3>Reviews:</h3>
 

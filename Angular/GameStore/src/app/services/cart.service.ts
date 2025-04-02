@@ -59,7 +59,9 @@ export class CartService {
   GetCurrentUserCart(): Observable<Cart> {
     return this.http.get<Cart>(this.url).pipe(
       map((cart: Cart) => {
-        this.setCart(cart);
+        if (cart) {
+          this.setCart(cart);
+        }
         return cart;
       })
     );
