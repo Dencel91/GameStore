@@ -252,7 +252,7 @@ public class CartService : ICartService
 
         //var userId = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
 
-        string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         return string.IsNullOrEmpty(userId) ? Guid.Empty : Guid.Parse(userId);
     }

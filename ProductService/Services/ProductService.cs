@@ -7,32 +7,46 @@ namespace ProductService.Services;
 
 public class ProductService : IProductService
 {
+    const int DefaultPageSize = 12;
+
     private readonly IProductRepo _productRepo;
-    private readonly IProductImageRepo _productImageRepo;
     private readonly IProductReviewRepo _productReviewRepo;
     private readonly IMapper _mapper;
 
     public ProductService(
         IProductRepo productRepo,
-        IProductImageRepo productImageRepo,
         IProductReviewRepo productReviewRepo,
         IMapper mapper)
     {
         _productRepo = productRepo;
-        _productImageRepo = productImageRepo;
         _productReviewRepo = productReviewRepo;
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<Product>> GetAllProducts()
+    public async Task<GetProductsResponse> GetPagedProducts(int pageCursor, int pageSize)
     {
-        var products = await _productRepo.GetAllProducts();
-        return products;
+        if (pageSize <= 0)
+        {
+            pageSize = DefaultPageSize;
+        }
+
+        var products = await _productRepo.GetPagedProducts(pageCursor, pageSize);
+
+        var response = new GetProductsResponse
+        {
+            Products = _mapper.Map<IEnumerable<ProductDto>>(products),
+            NextPageCursor = products.Any() ? products.Last().Id : 0
+        };
+
+        return response;
     }
 
     public Task<Product?> GetProduct(int id)
     {
-        ArgumentNullException.ThrowIfNull(id);
+        if (id <= 0)
+        {
+            throw new ArgumentException("Invalid product id", nameof(id));
+        }
 
         return _productRepo.GetProduct(id);
     }

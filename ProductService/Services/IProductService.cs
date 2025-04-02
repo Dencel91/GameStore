@@ -5,7 +5,7 @@ namespace ProductService.Services;
 
 public interface IProductService
 {
-    Task<IEnumerable<Product>> GetAllProducts();
+    Task<GetProductsResponse> GetPagedProducts(int pageCursor, int pageSize);
 
     Task<Product?> GetProduct(int id);
 

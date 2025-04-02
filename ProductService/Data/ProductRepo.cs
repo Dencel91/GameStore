@@ -24,9 +24,9 @@ public class ProductRepo : IProductRepo
         return product;
     }
 
-    public async Task<IEnumerable<Product>> GetAllProducts()
+    public async Task<IEnumerable<Product>> GetPagedProducts(int pageCursor, int pageSize)
     {
-        var products = await _context.Products.ToListAsync();
+        var products = await _context.Products.Where(p => p.Id > pageCursor).Take(pageSize).ToListAsync();
         return products;
     }
 

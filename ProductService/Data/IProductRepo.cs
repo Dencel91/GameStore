@@ -6,7 +6,7 @@ public interface IProductRepo
 {
     Task<bool> SaveChanges();
 
-    Task<IEnumerable<Product>> GetAllProducts();
+    Task<IEnumerable<Product>> GetPagedProducts(int pageCursor, int pageSize);
 
     Task<Product?> GetProduct(int id);
 

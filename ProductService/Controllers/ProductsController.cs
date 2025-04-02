@@ -20,36 +20,36 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet(Name = "GetProducts")]
-    public async Task<ActionResult<IEnumerable<ProductResponse>>> GetProducts()
+    public async Task<ActionResult<GetProductsResponse>> GetProducts(int nextPageCursor, int pageSize)
     {
-        var products = await _productService.GetAllProducts();
-        return base.Ok(_mapper.Map<IEnumerable<ProductResponse>>(products));
+        var response = await _productService.GetPagedProducts(nextPageCursor, pageSize);
+        return base.Ok(response);
     }
 
     [HttpGet("{id}", Name = "GetProductById")]
-    public async Task<ActionResult<ProductResponse>> GetProductById(int id)
+    public async Task<ActionResult<ProductDto>> GetProductById(int id)
     {
         var product = await _productService.GetProduct(id);
 
-        return product is not null ? base.Ok(_mapper.Map<ProductResponse>(product)) : NotFound();
+        return product is not null ? base.Ok(_mapper.Map<ProductDto>(product)) : NotFound();
     }
 
     [Authorize(Roles = "Admin")]
     [HttpPost]
-    public async Task<ActionResult<ProductResponse>> CreateProduct(CreateProductRequest createProductRequest)
+    public async Task<ActionResult<ProductDto>> CreateProduct(CreateProductRequest createProductRequest)
     {
         var product = await _productService.CreateProduct(createProductRequest);
-        var productResponse = _mapper.Map<ProductResponse>(product);
+        var productResponse = _mapper.Map<ProductDto>(product);
 
         return CreatedAtRoute(nameof(GetProductById), new { product.Id }, productResponse);
     }
 
     [HttpPost]
     [Route("GetProductsByIds")]
-    public async Task<ActionResult<IEnumerable<ProductResponse>>> GetProductsByIds(IEnumerable<int> Ids)
+    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByIds(IEnumerable<int> Ids)
     {
         var products = await _productService.GetProductsByIds(Ids);
-        return base.Ok(_mapper.Map<IEnumerable<ProductResponse>>(products));
+        return base.Ok(_mapper.Map<IEnumerable<ProductDto>>(products));
     }
 
     [HttpGet]

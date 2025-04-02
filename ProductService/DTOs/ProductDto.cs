@@ -1,8 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace ProductService.DTOs;
 
-namespace ProductService.DTOs;
-
-public class ProductResponse
+public class ProductDto
 {
     public int Id { get; set; }
 

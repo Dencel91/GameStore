@@ -8,7 +8,7 @@ public class ProductProfile : Profile
 {
     public ProductProfile()
     {
-        CreateMap<Product, ProductResponse>();
+        CreateMap<Product, ProductDto>();
         CreateMap<CreateProductRequest, Product>();
         CreateMap<Product, GrpcProductModel>();
         CreateMap<CreateProductReviewRequest, ProductReview>();
