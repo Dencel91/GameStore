@@ -17,12 +17,31 @@ spec:
       containers:
       - name: auth
         image: dencel2/auth-service:latest
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
         env:
         - name: AuthServiceConnection
           valueFrom:
             secretKeyRef:
               name: auth-service-connection
               key: ConnectionString
+        - name: RabbitMqUserName
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-secret
+              key: username
+        - name: RabbitMqPassword
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-secret
+              key: password
+        - name: AuthenticationToken
+          valueFrom:
+            secretKeyRef:
+              name: authentication-key
+              key: signing-key
         ports:
         - containerPort: 8080
 ---

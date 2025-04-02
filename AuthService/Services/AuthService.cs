@@ -16,11 +16,12 @@ namespace AuthService.Services;
 public class AuthService(
     IUserRepo userRepo,
     IConfiguration configuration,
-    IMessageBusClient messageBusClient) : IAuthService
+    IMessageBusClient messageBusClient,
+    IHostEnvironment environment) : IAuthService
 {
     public async Task<Guid> Register(RegisterRequest request)
     {
-        await VerifyRegisterRequest(request);
+        await ValidateRegisterRequest(request);
 
         var user = new User() { Name = request.UserName!, Role = "User", PasswordHash = string.Empty };
         var hashedPassword = new PasswordHasher<User>().HashPassword(user, request.Password!);
@@ -34,7 +35,18 @@ public class AuthService(
         return user.Id;
     }
 
-    private async Task VerifyRegisterRequest(RegisterRequest request)
+    private async Task ValidateRegisterRequest(RegisterRequest request)
+    {
+        ValidateRequest(request);
+
+        var userExists = await userRepo.UserExists(request.UserName);
+        if (userExists)
+        {
+            throw new ArgumentException("User with this name already exists");
+        }
+    }
+
+    private void ValidateRequest<T>(T request)
     {
         ArgumentNullException.ThrowIfNull(request, nameof(request));
 
@@ -52,12 +64,6 @@ public class AuthService(
 
             throw new ArgumentException(builder.ToString());
         }
-
-        var userExists = await userRepo.UserExists(request.UserName);
-        if (userExists)
-        {
-            throw new ArgumentException("User with this name already exists");
-        }
     }
 
     private void PublishUserRegistered(User user)
@@ -71,7 +77,7 @@ public class AuthService(
 
     public async Task<TokenResponse> Login(LoginRequest request)
     {
-        ValidateLoginRequest(request);
+        ValidateRequest(request);
 
         var user = await userRepo.GetUserByName(request.UserName!) ?? throw new ArgumentException("Invalid user or password");
 
@@ -91,11 +97,6 @@ public class AuthService(
             AccessToken = CreateToken(user),
             RefreshToken = await GenerateAndSaveRefreshToken(user)
         };
-    }
-
-    private void ValidateLoginRequest(LoginRequest request)
-    {
-        ArgumentNullException.ThrowIfNull(request, nameof(request));
     }
 
     private async Task<string> GenerateAndSaveRefreshToken(User user)
@@ -123,19 +124,31 @@ public class AuthService(
             new Claim(ClaimTypes.Role, user.Role)
         };
 
+        string AuthenticationToken;
+        if (environment.IsDevelopment())
+        {
+            AuthenticationToken = configuration["Authentication:Token"] ?? throw new InvalidOperationException("Authentication token not found");
+        }
+        else
+        {
+            AuthenticationToken = Environment.GetEnvironmentVariable("AuthenticationToken") ?? throw new InvalidOperationException("Authentication token not found");
+        }
+
         var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(configuration["Authorization:Token"]!));
+            Encoding.UTF8.GetBytes(AuthenticationToken));
 
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
 
         var tokenDescriptor = new JwtSecurityToken(
-            issuer: configuration["Authorization:Issuer"],
-            audience: configuration["Authorization:Audience"],
+            issuer: configuration["Authentication:Issuer"],
+            audience: configuration["Authentication:Audience"],
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(10),
             signingCredentials: credentials);
 
-        return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+        var token = new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+
+        return token;
     }
 
     public async Task<TokenResponse> RefreshTokens(RefreshTokenRequest request)

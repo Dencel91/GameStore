@@ -9,21 +9,26 @@
         <li class="nav-item">
           <a class="nav-link" aria-current="page" routerLinkActive="active"  routerLink="/store">Store</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" aria-current="page" routerLinkActive="active" routerLink="/cart">
-            Cart
-            @if(this.cartService!.cartItemCount > 0) {
-              <span class="badge rounded-pill text-bg-primary">{{this.cartService!.cartItemCount}}</span>
-            }
-          </a>
-        </li>
-        @if(this.authService.isLoggedIn){
-          <li class="nav-item">
-            <a class="nav-link" aria-current="page" routerLinkActive="active" routerLink="/library">Library</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" aria-current="page" routerLinkActive="active" routerLink="/profile">{{this.userService.user.name}}</a>
-          </li>
+        @if(this.authService.isLoggedIn) {
+          @if(this.authService.isAdmin()) {
+            <button class="nav-link" (click)="showAdminPanel()">Admin</button>
+          } @else {
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page" routerLinkActive="active" routerLink="/cart">
+                Cart
+                @if(this.cartService!.cartItemCount > 0) {
+                  <span class="badge rounded-pill text-bg-primary">{{this.cartService!.cartItemCount}}</span>
+                }
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page" routerLinkActive="active" routerLink="/library">Library</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page" routerLinkActive="active" routerLink="/profile">{{this.authService.userName}}</a>
+            </li>
+          }
+
           <button class="nav-link" (click)="logout()">Log out</button>
         }
         @else {
@@ -38,4 +43,5 @@
   </div>
 </nav>
 
-<app-login-modal></app-login-modal>
+<app-login-modal/>
+<app-admin-panel/>

@@ -1,13 +1,16 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { UserService } from './user.service';
 import { environment } from '../../environments/environment';
 import { BehaviorSubject, map, Observable } from 'rxjs';
+import { jwtDecode } from 'jwt-decode';
+import { CustomJwtPayload, NameClaim, RoleClaim, UserIdClaim } from '../interfaces/customJwtPayload';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  constructor(private http: HttpClient) { }
+
   url = environment.authUrl;
 
   isLoggedIn = this.getRefreshToken() !== '';
@@ -16,17 +19,37 @@ export class AuthService {
     return localStorage.getItem('token') ?? '';
   }
 
-  set token(value: string) {
-    localStorage.setItem('token', value);
+  get userId(): string {
+    return localStorage.getItem('userId') ?? '';
+  }
+
+  get userName(): string {
+    return localStorage.getItem('userName') ?? '';
   }
 
   getRefreshToken(): string {
     return localStorage.getItem('refreshToken') ?? '';
   }
 
-  setRefreshToken(value: string) {
-    localStorage.setItem('refreshToken', value);
-    this.isLoggedIn = value !== '';
+  setAuthInfo(loginResponse: any) {
+    localStorage.setItem('token', loginResponse.accessToken);
+    localStorage.setItem('refreshToken', loginResponse.refreshToken);
+
+    
+    let decodedToken = this.getDecodedToken();
+
+    if (decodedToken) {
+      localStorage.setItem('userId', decodedToken[UserIdClaim]);
+      localStorage.setItem('userName', decodedToken[NameClaim]);
+    }
+
+    this.isLoggedIn = true;
+  }
+
+  removeAuthInfo() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    this.isLoggedIn = false;
   }
 
   isAuthenticated(): boolean {
@@ -36,28 +59,23 @@ export class AuthService {
   private loginSubject = new BehaviorSubject<boolean>(false);
   public loginEvent$ = this.loginSubject.asObservable();
 
-  constructor(private http: HttpClient, private userService: UserService) { }
-
   login(username: string, password: string) {
     this.http.post(this.url + '/login', {username, password}).subscribe((response: any) => {
-      this.token = response.accessToken;
-      this.setRefreshToken(response.refreshToken);
+      this.setAuthInfo(response);
 
-      this.userService.getUserInfo();
       this.loginSubject.next(true);
     });
   }
 
   refreshToken() : Observable<any> {
     const request = {
-      userId: this.userService.user.id,
+      userId: this.userId,
       RefreshToken: this.getRefreshToken()
     };
 
     return this.http.post(this.url + '/refresh-token', request).pipe(
       map((response: any) => {
-        this.token = response.accessToken;
-        this.setRefreshToken(response.refreshToken);
+        this.setAuthInfo(response);
         return response;
       }));
   }
@@ -74,10 +92,32 @@ export class AuthService {
   }
 
   logout() {
-    this.token = '';
-    this.setRefreshToken('');
-    this.userService.user = {};
+    this.removeAuthInfo();
 
     this.loginSubject.next(false);
+  }
+
+  isAdmin(): boolean {
+    let test = this.getUserRole();
+    return this.getUserRole() === 'Admin';
+  }
+
+  private getUserName(): string {
+    const decodedToken = this.getDecodedToken();
+    return decodedToken ? decodedToken[NameClaim] : '';
+  }
+
+  private getUserRole(): string {
+    const decodedToken = this.getDecodedToken();
+    return decodedToken ? decodedToken[RoleClaim] : '';
+  }
+
+  private getDecodedToken(): CustomJwtPayload | null {
+    try {
+      return jwtDecode<CustomJwtPayload>(this.token);
+    } catch (error) {
+      console.error('Invalid token', error);
+      return null;
+    }
   }
 }

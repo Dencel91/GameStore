@@ -9,11 +9,39 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class CartService {
+
+  constructor(private http: HttpClient, private authService: AuthService) {
+    this.authService.loginEvent$.subscribe(isLoggedIn => {
+      if (isLoggedIn) {
+        if (this.cartId) {
+          this.mergeCarts().subscribe(cart => {
+            this.setCart(cart);
+          });
+        }
+        else {
+          this.GetCurrentUserCart().subscribe(cart => {
+            if (cart) {
+              this.setCart(cart);
+            }
+          });
+        }
+      }
+      else {
+        this.removeCart();
+      }
+    });
+  }
+
   private url = environment.cartUrl;
 
   setCart(cart: Cart) {
     localStorage.setItem("cartId", cart.id.toString());
     localStorage.setItem("cartItemCount", cart.products.length.toString());
+  }
+
+  removeCart() {
+    localStorage.removeItem("cartId");
+    localStorage.removeItem("cartItemCount");
   }
 
   get cartId(): number{
@@ -26,28 +54,6 @@ export class CartService {
 
   get cartItemCount(): number {
     return parseInt(localStorage.getItem("cartItemCount") ?? "0");
-  }
-
-  constructor(private http: HttpClient, private authService: AuthService) {
-    this.authService.loginEvent$.subscribe(isLoggedIn => {
-      if (isLoggedIn) {
-        if (this.cartId > 0) {
-          this.mergeCarts().subscribe(cart => {
-            this.cartId = cart.id;
-          });
-        }
-        else {
-          this.GetCurrentUserCart().subscribe(cart => {
-            if (cart) {
-              this.cartId = cart.id;
-            }
-          });
-        }
-      }
-      else {
-        this.cartId = 0;
-      }
-    });
   }
 
   GetCurrentUserCart(): Observable<Cart> {

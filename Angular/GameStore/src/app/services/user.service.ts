@@ -3,11 +3,23 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Product } from '../interfaces/product';
 import { Observable } from 'rxjs';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
+
+  constructor(private httpClient: HttpClient, private authService: AuthService) { 
+    this.authService.loginEvent$.subscribe(isLoggedIn => {
+      if (isLoggedIn) {
+        this.getUserInfo();
+      } else {
+        localStorage.removeItem('user');
+      }
+    });
+  }
+
   url = environment.userUrl;
 
   set user(value: any) {
@@ -18,16 +30,8 @@ export class UserService {
     return JSON.parse(localStorage.getItem('user') ?? '{}');
   }
 
-  constructor(private httpClient: HttpClient) { }
-
   getUserInfo() {
-    const options = {
-      headers: new HttpHeaders({
-        'Authorization': 'Bearer ' + localStorage.getItem('token')
-      })
-    };
-
-    this.httpClient.get(this.url, options).subscribe((response: any) => {
+    this.httpClient.get(this.url).subscribe((response: any) => {
       this.user = response;
     });
   }
