@@ -7,10 +7,10 @@
 
     @switch (this.currentRoute) {
       @case ('store') {
-        <button class="btn btn-primary">Add product</button>
+        <button class="btn btn-primary" (click)="AddProduct()">Add product</button>
       }
       @case ('product') {
-        <button class="btn btn-primary">Edit product</button>
+        <button class="btn btn-primary" (click)="EditProduct()">Edit product</button>
       }
     }
     

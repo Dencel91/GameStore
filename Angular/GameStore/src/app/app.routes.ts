@@ -7,6 +7,9 @@ import { SignUpComponent } from './sign-up/sign-up.component';
 import { LibraryPageComponent } from './library-page/library-page.component';
 import { ProfilePageComponent } from './profile-page/profile-page.component';
 import { AuthGuard } from './guards/auth.guard';
+import { AdminGuard } from './guards/admin.guard';
+import { AddProductPageComponent } from './add-product-page/add-product-page.component';
+import { EditProductPageComponent } from './edit-product-page/edit-product-page.component';
 
 export const routes: Routes = [
     {path: '', redirectTo: 'store', pathMatch: 'full'},
@@ -17,5 +20,7 @@ export const routes: Routes = [
     {path: 'signup', component: SignUpComponent, canActivate: [AuthGuard]},
     {path: 'library', component: LibraryPageComponent, canActivate: [AuthGuard]},
     {path: 'profile', component: ProfilePageComponent, canActivate: [AuthGuard]},
+    {path: 'add-product', component: AddProductPageComponent, canActivate: [AdminGuard]},
+    {path: 'edit-product/:id', component: EditProductPageComponent, canActivate: [AdminGuard]},
     {path: '**', component: PageNotFoundComponent},
 ];

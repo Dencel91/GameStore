@@ -27,4 +27,18 @@ export class AdminPanelComponent {
 
 		this.offcanvas = this.offcanvasService.open(this.offCanvasContent);
 	}
+
+  close() {
+    this.offcanvas.close();
+  }
+
+  AddProduct() {
+    this.router.navigate(['/add-product']);
+    this.close();
+  }
+
+  EditProduct() {
+    this.router.navigate(['/edit-product', this.currentRouteParams]);
+    this.close();
+  }
 }
