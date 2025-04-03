@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using ProductService.Models;
 
 namespace ProductService.Data;
@@ -44,5 +45,12 @@ public class ProductRepo : IProductRepo
     public Task<Product?> GetProductDetails(int id)
     {
         return _context.Products.Include(p => p.Images.OrderBy(i => i.Order)).FirstOrDefaultAsync(p => p.Id == id);
+    }
+
+    public async Task<IEnumerable<Product>> SearchProduct(string searchText)
+    {
+        var query = _context.Products.Where(p => EF.Functions.Like(p.Name, "%" + searchText + "%"));
+        var products = await query.ToListAsync();
+        return products;
     }
 }

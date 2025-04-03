@@ -16,4 +16,5 @@ public interface IProductService
     Task<Product?> GetProductDetails(int id);
 
     Task<ProductReview> CreateProductReview(CreateProductReviewRequest request);
+    Task<IEnumerable<Product>> SearchProduct(string searchText);
 }

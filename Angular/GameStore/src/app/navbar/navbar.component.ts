@@ -1,11 +1,11 @@
-import { Component, inject, signal, TemplateRef, ViewChild, WritableSignal } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { ModalDismissReasons, NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import { Component, ViewChild } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { LoginModalComponent } from "../login-modal/login-modal.component";
 import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
 import { CartService } from '../services/cart.service';
 import { AdminPanelComponent } from "../admin-panel/admin-panel.component";
+import { ProductService } from '../services/product.service';
 
 @Component({
   selector: 'app-navbar',
@@ -21,6 +21,7 @@ export class NavbarComponent {
     public authService: AuthService,
     public userService: UserService,
     public cartService: CartService,
+    public productService: ProductService,
     private router: Router) { }
 
   showLoginModal() {
@@ -34,5 +35,13 @@ export class NavbarComponent {
 
   showAdminPanel() {
     this.adminPanel.open();
+  }
+
+  searchProduct(term: string) {
+    if (!term) {
+      return;
+    }
+
+    this.router.navigate(['/search', term]);
   }
 }

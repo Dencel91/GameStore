@@ -34,6 +34,10 @@ export class ProductService {
     return this.http.get<Product>(this.url + '/GetProductsDetails/' + id);
   }
 
+  SearchProduct(searchText: string): Observable<Product[]> {
+    return this.http.get<Product[]>(this.url + '/Search?searchText=' + searchText);
+  }
+
   AddProduct(product: Product): Observable<Product> {
     return this.http.post<Product>(this.url, product);
   }

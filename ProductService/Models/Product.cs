@@ -21,7 +21,6 @@ public class Product
     [Required]
     public required string ThumbnailUrl { get; set; }
 
-    //public IEnumerable<ProductImage>? Images { get; set; }
     public virtual ICollection<ProductImage> Images { get; set; } = [];
 
     public virtual ICollection<ProductReview>? Reviews { get; set; } = [];

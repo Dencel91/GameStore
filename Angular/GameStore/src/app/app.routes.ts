@@ -10,12 +10,14 @@ import { AuthGuard } from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
 import { AddProductPageComponent } from './add-product-page/add-product-page.component';
 import { EditProductPageComponent } from './edit-product-page/edit-product-page.component';
+import { SearchPageComponent } from './search-page/search-page.component';
 
 export const routes: Routes = [
     {path: '', redirectTo: 'store', pathMatch: 'full'},
     // {path: 'products', loadChildren: './product-list/product-list.module#ProductListModule'},
     {path: 'store', component: ProductListComponent},
     {path: 'product/:id', component: ProductPageComponent},
+    {path: 'search/:term', component: SearchPageComponent},
     {path: 'cart', component: CartPageComponent},
     {path: 'signup', component: SignUpComponent, canActivate: [AuthGuard]},
     {path: 'library', component: LibraryPageComponent, canActivate: [AuthGuard]},

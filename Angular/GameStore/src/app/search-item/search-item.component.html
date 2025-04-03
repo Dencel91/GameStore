@@ -1,0 +1,15 @@
+@if(product) {
+    <a routerLink="/product/{{product.id}}">
+        <div class="card mb-3 mt-3">
+            <div class="row g-0">
+                <div class="col-lg-6 col-md-6  max-vw-100">
+                    <img src="{{product.thumbnailUrl}}" class="img-fluid rounded-start" alt="...">
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <div class="card-body">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </a>
+}

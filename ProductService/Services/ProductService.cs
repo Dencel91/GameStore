@@ -51,6 +51,17 @@ public class ProductService : IProductService
         return _productRepo.GetProduct(id);
     }
 
+    public async Task<IEnumerable<Product>> SearchProduct(string searchText)
+    {
+        if (string.IsNullOrEmpty(searchText))
+        {
+            throw new ArgumentNullException(nameof(searchText));
+        }
+
+        var products = await _productRepo.SearchProduct(searchText);
+        return products;
+    }
+
     public async Task<Product> CreateProduct(CreateProductRequest request)
     {
         ValidateCreateProductRequest(request);

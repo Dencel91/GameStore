@@ -34,21 +34,17 @@ public class ProductsController : ControllerBase
         return product is not null ? base.Ok(_mapper.Map<ProductDto>(product)) : NotFound();
     }
 
-    [Authorize(Roles = "Admin")]
-    [HttpPost]
-    public async Task<ActionResult<ProductDto>> CreateProduct(CreateProductRequest createProductRequest)
-    {
-        var product = await _productService.CreateProduct(createProductRequest);
-        var productResponse = _mapper.Map<ProductDto>(product);
-
-        return CreatedAtRoute(nameof(GetProductById), new { product.Id }, productResponse);
-    }
-
-    [HttpPost]
-    [Route("GetProductsByIds")]
+    [HttpGet("GetProductsByIds")]
     public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByIds(IEnumerable<int> Ids)
     {
         var products = await _productService.GetProductsByIds(Ids);
+        return base.Ok(_mapper.Map<IEnumerable<ProductDto>>(products));
+    }
+
+    [HttpGet("Search")]
+    public async Task<ActionResult<IEnumerable<ProductDto>>> SearchProduct(string searchText)
+    {
+        var products = await _productService.SearchProduct(searchText);
         return base.Ok(_mapper.Map<IEnumerable<ProductDto>>(products));
     }
 
@@ -60,8 +56,18 @@ public class ProductsController : ControllerBase
         return product is not null ? base.Ok(_mapper.Map<ProductDetailsResponse>(product)) : NotFound();
     }
 
+
+    [Authorize(Roles = "Admin")]
     [HttpPost]
-    [Route("AddReview")]
+    public async Task<ActionResult<ProductDto>> CreateProduct(CreateProductRequest createProductRequest)
+    {
+        var product = await _productService.CreateProduct(createProductRequest);
+        var productResponse = _mapper.Map<ProductDto>(product);
+
+        return CreatedAtRoute(nameof(GetProductById), new { product.Id }, productResponse);
+    }
+
+    [HttpPost("AddReview")]
     public async Task<ActionResult> CreateProductReview(CreateProductReviewRequest request)
     {
         var product = await _productService.CreateProductReview(request);

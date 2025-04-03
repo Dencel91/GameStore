@@ -15,4 +15,6 @@ public interface IProductRepo
     Task<IEnumerable<Product>> GetProductsByIds(IEnumerable<int> ids);
 
     Task<Product?> GetProductDetails(int id);
+
+    Task<IEnumerable<Product>> SearchProduct(string searchText);
 }
