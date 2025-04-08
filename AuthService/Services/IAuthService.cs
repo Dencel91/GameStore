@@ -9,4 +9,6 @@ public interface IAuthService
     Task<TokenResponse> Login(LoginRequest request);   
 
     Task<TokenResponse> RefreshTokens(RefreshTokenRequest request);
+
+    Task<TokenResponse> GoogleLogin(string credential);
 }

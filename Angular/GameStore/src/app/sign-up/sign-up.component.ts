@@ -14,6 +14,7 @@ export class SignUpComponent {
 
   signUpForm = new FormGroup({
     userName: new FormControl(),
+    email: new FormControl(),
     password: new FormControl(),
     checkPassword: new FormControl(),
     // email: new FormControl(),
@@ -21,7 +22,11 @@ export class SignUpComponent {
   });
 
   submit() {
-    this.authService.register(this.signUpForm.value.userName, this.signUpForm.value.password, this.signUpForm.value.checkPassword)
+    this.authService.register(
+      this.signUpForm.value.userName,
+      this.signUpForm.value.email,
+      this.signUpForm.value.password,
+      this.signUpForm.value.checkPassword)
       .subscribe(() => {
         alert("User registered successfully!");
       });

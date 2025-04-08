@@ -4,6 +4,7 @@ import { environment } from '../../environments/environment';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { CustomJwtPayload, NameClaim, RoleClaim, UserIdClaim } from '../interfaces/customJwtPayload';
+declare const google: any;
 
 @Injectable({
   providedIn: 'root'
@@ -67,6 +68,19 @@ export class AuthService {
     });
   }
 
+  googleLogin(credential: string): Observable<any> {
+    const headers = { 'Content-Type': 'application/json'}
+
+    const body = JSON.stringify(credential);
+
+    return this.http.post(this.url + '/google-login', body, { headers }).pipe(
+      map((response: any) => {
+        this.setAuthInfo(response);
+        this.loginSubject.next(true);
+        return response;
+      }));
+  }
+
   refreshToken() : Observable<any> {
     const request = {
       userId: this.userId,
@@ -80,10 +94,11 @@ export class AuthService {
       }));
   }
 
-  register(username: string, password: string, verifyPassword: string) {
+  register(username: string, email: string, password: string, verifyPassword: string) {
 
     const request = {
       username: username,
+      email: email,
       password: password,
       verifypassword: verifyPassword
     };
@@ -93,7 +108,7 @@ export class AuthService {
 
   logout() {
     this.removeAuthInfo();
-
+    google.accounts.id.disableAutoSelect();
     this.loginSubject.next(false);
   }
 

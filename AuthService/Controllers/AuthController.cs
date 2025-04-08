@@ -37,6 +37,21 @@ namespace AuthService.Controllers
             }
         }
 
+        [HttpPost("google-login")]
+        public async Task<ActionResult<TokenResponse>> GoogleLogin([FromBody] string credential)
+        {
+            try
+            {
+                var result = await authService.GoogleLogin(credential);
+
+                return Ok(result);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPost("refresh-token")]
         public async Task<ActionResult<TokenResponse>> RefreshToken([FromBody] RefreshTokenRequest requet)
         {

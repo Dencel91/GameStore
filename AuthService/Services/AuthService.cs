@@ -3,6 +3,7 @@ using AuthService.DataServices;
 using AuthService.DTOs;
 using AuthService.Events;
 using AuthService.Models;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel.DataAnnotations;
@@ -23,7 +24,7 @@ public class AuthService(
     {
         await ValidateRegisterRequest(request);
 
-        var user = new User() { Name = request.UserName!, Role = "User", PasswordHash = string.Empty };
+        var user = new User() { Name = request.UserName!, Role = "User", PasswordHash = string.Empty, Email = request.Email! };
         var hashedPassword = new PasswordHasher<User>().HashPassword(user, request.Password!);
         user.PasswordHash = hashedPassword;
 
@@ -88,6 +89,54 @@ public class AuthService(
         }
 
         return await CreateTokenResponse(user);
+    }
+
+    public async Task<TokenResponse> GoogleLogin(string credential)
+    {
+        if (string.IsNullOrEmpty(credential))
+        {
+            throw new ArgumentException("Invalid Google credential");
+        }
+
+        var googleClientId = Environment.GetEnvironmentVariable("GoogleAuthClientId");
+        if (string.IsNullOrEmpty(googleClientId))
+        {
+            throw new InvalidOperationException("Google client ID not found");
+        }
+
+        var settings = new GoogleJsonWebSignature.ValidationSettings()
+        {
+            Audience = new[] { googleClientId }
+        };
+
+        var payload = GoogleJsonWebSignature.ValidateAsync(credential, settings).Result;
+
+        var user = await userRepo.GetUserByName(payload.Name);
+
+        if (user is null)
+        {
+            user = await RegisterGoogle(payload);
+        }
+
+        return await CreateTokenResponse(user);
+    }
+
+    private async Task<User> RegisterGoogle(GoogleJsonWebSignature.Payload payload)
+    {
+        var user = new User()
+        {
+            Name = payload.Name,
+            Email = payload.Email,
+            Role = "User",
+            PasswordHash = string.Empty,
+            RegisterType = RegisterType.Google,
+        };
+        await userRepo.AddUser(user);
+        await userRepo.SaveChanges();
+
+        PublishUserRegistered(user);
+
+        return user;
     }
 
     private async Task<TokenResponse> CreateTokenResponse(User user)

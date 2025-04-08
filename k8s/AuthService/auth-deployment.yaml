@@ -42,6 +42,11 @@ spec:
             secretKeyRef:
               name: authentication-key
               key: signing-key
+        - name: GoogleAuthClientId
+          valueFrom:
+            secretKeyRef:
+              name: google-auth-secret
+              key: client-id
         ports:
         - containerPort: 8080
 ---

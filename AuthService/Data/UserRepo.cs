@@ -21,6 +21,11 @@ namespace AuthService.Data
             return context.Users.FirstOrDefaultAsync(u => u.Name.Equals(userName));
         }
 
+        public Task<User?> GetUserByEmail(string email)
+        {
+            return context.Users.FirstOrDefaultAsync(u => u.Email.Equals(email));
+        }
+
         public async Task AddUser(User user)
         {
             await context.Users.AddAsync(user);

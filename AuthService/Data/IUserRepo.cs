@@ -10,6 +10,8 @@ namespace AuthService.Data
 
         Task<User?> GetUserByName(string userName);
 
+        Task<User?> GetUserByEmail(string email);
+
         Task AddUser(User user);
 
         Task<bool> UserExists(string userName);

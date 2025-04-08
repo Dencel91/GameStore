@@ -16,14 +16,14 @@ export class AuthGuard implements CanActivate {
 
     if (isAuthenticated) {
       const path = next.routeConfig?.path;
-      if (path === 'signup') {
+      if (path === 'signup'|| path === 'login') {
         this.router.navigate(['/']);
         return false;
       }
       return true;
     }
 
-    if (next.routeConfig?.path === 'signup') {
+    if (next.routeConfig?.path === 'signup' || next.routeConfig?.path === 'login') {
       return true;
     }
 
