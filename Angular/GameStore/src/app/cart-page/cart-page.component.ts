@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CartService } from '../services/cart.service';
 import { Cart } from '../interfaces/cart';
 import { CartItemComponent } from "../cart-item/cart-item.component";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-cart-page',
@@ -12,7 +13,7 @@ import { CartItemComponent } from "../cart-item/cart-item.component";
 export class CartPageComponent {
   cart: Cart | undefined;
 
-  constructor(private cartService: CartService) { }
+  constructor(private cartService: CartService, private router: Router) { }
 
   ngOnInit() {
     console.log('Cart page loaded');
@@ -31,6 +32,8 @@ export class CartPageComponent {
   }
 
   startPayment() {
-    console.log('Payment started');
+    this.cartService.StartPayment().subscribe((response: any) => {
+      this.router.navigate(['/checkout']);
+    });
   }
 }

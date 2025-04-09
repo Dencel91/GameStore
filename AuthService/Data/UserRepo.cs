@@ -31,9 +31,15 @@ namespace AuthService.Data
             await context.Users.AddAsync(user);
         }
 
-        public Task<bool> UserExists(string userName)
+        public Task<bool> UserNameExists(string userName)
         {
             return context.Users.AnyAsync(u => u.Name == userName);
+        }
+
+
+        public Task<bool> EmailExists(string email)
+        {
+            return context.Users.AnyAsync(u => u.Email == email);
         }
     }
 }

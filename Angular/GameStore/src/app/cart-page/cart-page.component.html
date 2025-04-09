@@ -13,7 +13,7 @@
                 <div class="card">
                     <div class="card-body">
                         <h5>Total ${{cart.totalPrice}}</h5>
-                        <button type="button" [disabled]="cart.products.length == 0" class="btn btn-primary">Continue to payment</button>
+                        <button type="button" [disabled]="cart.products.length == 0" class="btn btn-primary" (click)="startPayment()">Continue to payment</button>
                     </div>
                 </div>
             </div>

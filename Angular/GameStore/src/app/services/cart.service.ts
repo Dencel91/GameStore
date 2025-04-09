@@ -82,17 +82,11 @@ export class CartService {
       cartId: this.cartId ?? 0
     }
 
-    let requestUrl = this.url + '/AddProduct';
+    let requestUrl = this.url + '/add-product';
 
     return this.http.post<Cart>(requestUrl, body).pipe(
       map((cart: Cart) => {
-        // if(!this.cartId)
-        //   {
-        //     this.cartId = cart.id;
-        //     console.log("Set cart id", this.cartId);
-        //   }
         this.setCart(cart);
-    
         return cart;
       })
     );
@@ -100,7 +94,7 @@ export class CartService {
 
   RemoveFromCart(productId: Number) : Observable<Cart> {
     const options = {body: {cartId: this.cartId, productId}};
-    return this.http.delete<Cart>(this.url + '/RemoveProduct', options).pipe(
+    return this.http.delete<Cart>(this.url + '/remove-product', options).pipe(
       map((cart: Cart) => {
         this.setCart(cart);
         return cart;
@@ -108,19 +102,20 @@ export class CartService {
     ));
   }
 
-  mergeCarts() : Observable<Cart> {
-    return this.http.post<Cart>(this.url + '/merge-carts', this.cartId);
+  mergeCarts(): Observable<Cart> {
+    return this.http.post<Cart>(this.url + '/merge', this.cartId);
   }
 
-  StartPayment() {
-    this.http.post(this.url + '/payment', null);
-
-    console.log("Payment started");
+  StartPayment(): Observable<any> {
+    return this.http.post(this.url + '/payment/start', this.cartId);
   }
 
-  CompletePayment() {
-    this.http.post(this.url + '/payment/complete', null);
-
-    console.log("Payment completed");
+  CompletePayment(): Observable<any> {
+    return this.http.post(this.url + '/payment/complete', this.cartId).pipe(
+      map((response: any) => {
+        this.removeCart();
+        return response;
+      })
+    );
   }
 }

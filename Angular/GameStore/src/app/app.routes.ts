@@ -12,6 +12,7 @@ import { AddProductPageComponent } from './add-product-page/add-product-page.com
 import { EditProductPageComponent } from './edit-product-page/edit-product-page.component';
 import { SearchPageComponent } from './search-page/search-page.component';
 import { LoginPageComponent } from './login-page/login-page.component';
+import { CheckoutPageComponent } from './checkout-page/checkout-page.component';
 
 export const routes: Routes = [
     {path: '', redirectTo: 'store', pathMatch: 'full'},
@@ -19,6 +20,7 @@ export const routes: Routes = [
     {path: 'product/:id', component: ProductPageComponent},
     {path: 'search/:term', component: SearchPageComponent},
     {path: 'cart', component: CartPageComponent},
+    {path: 'checkout', component: CheckoutPageComponent},
     {path: 'login', component: LoginPageComponent, canActivate: [AuthGuard]},
     {path: 'signup', component: SignUpComponent, canActivate: [AuthGuard]},
     {path: 'library', component: LibraryPageComponent, canActivate: [AuthGuard]},

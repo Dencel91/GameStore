@@ -17,7 +17,7 @@ export class AuthGuard implements CanActivate {
     if (isAuthenticated) {
       const path = next.routeConfig?.path;
       if (path === 'signup'|| path === 'login') {
-        this.router.navigate(['/']);
+        this.router.navigate(['/login']);
         return false;
       }
       return true;
@@ -27,7 +27,7 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    this.router.navigate(['/']);
+    this.router.navigate(['/login']);
     return false;
   }
 }

@@ -6,6 +6,8 @@ public class UserRegisteredEvent : Event
 
     public required string UserName { get; set; }
 
+    public required string Email { get; set; }
+
     public UserRegisteredEvent()
     {
         EventTypeName = "User registered";

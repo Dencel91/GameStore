@@ -9,12 +9,14 @@ public class MessageBusSubscriber : BackgroundService
 {
     private const string UserRegisteredExchangeName = "UserRegistered";
     private const string PurchaseCompletedExchangeName = "PurchaseCompleted";
+    private const string UserRegisteredQueueName = "UserRegisteredQueue";
+    private const string PurchaseCompletedQueueName = "PurchaseCompletedQueue";
+
 
     private readonly IEventProcessor _eventProcessor;
     private readonly ILogger<MessageBusSubscriber> _logger;
     private IConnection _connection;
     private IChannel _channel;
-    private string _queueName;
 
     public MessageBusSubscriber(
         IConfiguration configuration,
@@ -67,12 +69,12 @@ public class MessageBusSubscriber : BackgroundService
             _channel = await _connection.CreateChannelAsync();
 
             await _channel.ExchangeDeclareAsync(UserRegisteredExchangeName, ExchangeType.Fanout);
-            _queueName = (await _channel.QueueDeclareAsync(exclusive: false, queue: "UserRegisteredQueue", durable: true, autoDelete: false)).QueueName;
-            await _channel.QueueBindAsync(_queueName, UserRegisteredExchangeName, "");
+            await _channel.QueueDeclareAsync(exclusive: false, queue: UserRegisteredQueueName, durable: true, autoDelete: false);
+            await _channel.QueueBindAsync(UserRegisteredQueueName, UserRegisteredExchangeName, "");
 
             await _channel.ExchangeDeclareAsync(PurchaseCompletedExchangeName, ExchangeType.Fanout);
-            _queueName = (await _channel.QueueDeclareAsync(exclusive: false, queue: "PurchaseCompletedQueue", durable: true, autoDelete: false)).QueueName;
-            await _channel.QueueBindAsync(_queueName, PurchaseCompletedExchangeName, "");
+            await _channel.QueueDeclareAsync(exclusive: false, queue: PurchaseCompletedQueueName, durable: true, autoDelete: false);
+            await _channel.QueueBindAsync(PurchaseCompletedQueueName, PurchaseCompletedExchangeName, "");
         }
         catch (Exception ex)
         {
@@ -104,7 +106,8 @@ public class MessageBusSubscriber : BackgroundService
 
         try
         {
-            await _channel.BasicConsumeAsync(queue: _queueName, autoAck: true, consumer: consumer);
+            await _channel.BasicConsumeAsync(queue: UserRegisteredQueueName, autoAck: true, consumer: consumer);
+            await _channel.BasicConsumeAsync(queue: PurchaseCompletedQueueName, autoAck: true, consumer: consumer);
         }
         catch (Exception ex)
         {

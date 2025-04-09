@@ -40,10 +40,16 @@ public class AuthService(
     {
         ValidateRequest(request);
 
-        var userExists = await userRepo.UserExists(request.UserName);
+        var userExists = await userRepo.UserNameExists(request.UserName!);
         if (userExists)
         {
             throw new ArgumentException("User with this name already exists");
+        }
+
+        var emailExists = await userRepo.EmailExists(request.Email!);
+        if (emailExists)
+        {
+            throw new ArgumentException("User with this email already exists");
         }
     }
 
@@ -72,7 +78,9 @@ public class AuthService(
         messageBusClient.PublishUserRegistered(new UserRegisteredEvent()
         {
             UserId = user.Id,
-            UserName = user.Name
+            UserName = user.Name,
+            Email = user.Email
+
         });
     }
 

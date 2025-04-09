@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using UserService.Data;
 using UserService.DataServices.MessageBus.Events;
 using UserService.Dtos;
 using UserService.Models;
@@ -38,19 +37,29 @@ public class EventProcessor : IEventProcessor
 
     public async Task ProcessEvent(string message)
     {
-        var eventType = DeterminateEvent(message);
-        switch (eventType)
+        try
         {
-            case EventTypes.UserRegistered:
-                await AddUser(message);
-                break;
-            case EventTypes.PurchaseCompleted:
-                await AddProductsToUser(message);
-                break;
-            default:
-                _logger.LogError("Event is not recognized: {message}", message);
-                throw new ArgumentException($"Event is not recognized: {message}");
+            var eventType = DeterminateEvent(message);
+
+            switch (eventType)
+            {
+                case EventTypes.UserRegistered:
+                    await AddUser(message);
+                    break;
+                case EventTypes.PurchaseCompleted:
+                    await AddProductsToUser(message);
+                    break;
+                default:
+                    _logger.LogError("Event is not recognized: {message}", message);
+                    throw new ArgumentException($"Event is not recognized: {message}");
+            }
         }
+        catch (Exception ex)
+        {
+            _logger.LogError("Process event error: {error}. message: {message}", ex.Message, message);
+            throw;
+        }
+
     }
 
     private Task<User> AddUser(string message)
@@ -67,6 +76,7 @@ public class EventProcessor : IEventProcessor
             {
                 Id = userRegisteredEvent.UserId,
                 Name = userRegisteredEvent.UserName,
+                Email = userRegisteredEvent.Email
             };
 
             return userService.AddUser(request);

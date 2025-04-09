@@ -17,11 +17,6 @@ export class LoginPageComponent {
 
   googleClientId: string = '1025391897494-kcsdhm4qvkftht1amto3h4qtd1vh0tmk.apps.googleusercontent.com';
 
-  @ViewChild('content', { static: true }) content!: TemplateRef<any>;
-  private modalService = inject(NgbModal);
-  modal: NgbModalRef | undefined;
-  closeResult: WritableSignal<string> = signal('');
-
   loginForm = new FormGroup({
     userName: new FormControl(),
     password: new FormControl(),
@@ -57,34 +52,8 @@ export class LoginPageComponent {
     });
   }
 
-  open() {
-		this.modal = this.modalService.open(this.content, { ariaLabelledBy: 'modal-basic-title' });
-    
-    this.triggerGoogleSignIn();
-
-    this.modal.result.then(
-			(result) => {
-				this.closeResult.set(`Closed with: ${result}`);
-			},
-			(reason) => {
-				this.closeResult.set(`Dismissed ${this.getDismissReason(reason)}`);
-			},
-		);
-	}
-
-  private getDismissReason(reason: any): string {
-		switch (reason) {
-			case ModalDismissReasons.ESC:
-				return 'by pressing ESC';
-			case ModalDismissReasons.BACKDROP_CLICK:
-				return 'by clicking on a backdrop';
-			default:
-				return `with: ${reason}`;
-		}
-	}
-
   login() {
     this.authService.login(this.loginForm.value.userName, this.loginForm.value.password);
-    this.modal?.close();
+    this.router.navigate(['/store']);
   }
 }

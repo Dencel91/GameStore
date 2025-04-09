@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using CartService.DTOs;
-using CartService.Models;
 using CartService.Services;
 using Microsoft.AspNetCore.Authorization;
 
@@ -56,7 +55,7 @@ namespace CartService.Controllers
         }
 
         [HttpPost]
-        [Route("AddProduct")]
+        [Route("add-product")]
         public async Task<ActionResult<CartDto>> AddProduct([FromBody]AddProductRequest addProductRequest)
         {
             try
@@ -72,7 +71,7 @@ namespace CartService.Controllers
         }
 
         [HttpDelete]
-        [Route("RemoveProduct")]
+        [Route("remove-product")]
         public async Task<ActionResult<CartDto>> RemoveProduct([FromBody] AddProductRequest addProductRequest)
         {
             var cart = await _cartService.RemoveProduct(addProductRequest.CartId, addProductRequest.ProductId);
@@ -81,7 +80,7 @@ namespace CartService.Controllers
         }
 
         [Authorize]
-        [HttpPost("merge-carts")]
+        [HttpPost("merge")]
         public async Task<ActionResult<CartDto>> MergeCarts([FromBody] int cartId)
         {
             var cart = await _cartService.MergeCarts(cartId);
@@ -90,7 +89,7 @@ namespace CartService.Controllers
 
         [Authorize]
         [HttpPost]
-        [Route("StartPayment")]
+        [Route("payment/start")]
         public async Task<ActionResult> StartPayment([FromBody] int cartId)
         {
             try
@@ -105,7 +104,7 @@ namespace CartService.Controllers
         }
 
         [HttpPost]
-        [Route("CompletePayment")]
+        [Route("payment/complete")]
         public async Task<ActionResult> CompletePayment([FromBody] int cartId)
         {
             await _cartService.CompletePayment(cartId);

@@ -2,10 +2,13 @@ import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest
 import { Inject, Injectable } from "@angular/core";
 import { catchError, Observable, switchMap, throwError } from "rxjs";
 import { AuthService } from "../services/auth.service";
+import { Router } from "@angular/router";
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  constructor(@Inject(AuthService) private authService: AuthService) { }
+  constructor(
+    @Inject(AuthService) private authService: AuthService,
+    @Inject(Router) private router: Router) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const token = this.authService.token;
@@ -25,6 +28,10 @@ export class AuthInterceptor implements HttpInterceptor {
 
   private handleAuthError(req: HttpRequest<any>, next: HttpHandler, error: HttpErrorResponse): Observable<HttpEvent<any>> {
     if (error.status === 401) {
+      if (!this.authService.getRefreshToken()) {
+        this.router.navigate(["/login"]);
+      }
+
       return this.authService.refreshToken().pipe(
         switchMap((response: { accessToken: string }) => {
           const cloned = req.clone({
@@ -35,6 +42,7 @@ export class AuthInterceptor implements HttpInterceptor {
         catchError((refreshError) => {
           if (refreshError.status === 401) {
             this.authService.logout();
+            this.router.navigate(["/login"]);
           }
           return throwError(() => refreshError);
         })

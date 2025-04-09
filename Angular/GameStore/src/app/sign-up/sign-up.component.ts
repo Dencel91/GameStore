@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-sign-up',
@@ -10,7 +11,7 @@ import { AuthService } from '../services/auth.service';
 })
 export class SignUpComponent {
 
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService, private router: Router) { }
 
   signUpForm = new FormGroup({
     userName: new FormControl(),
@@ -28,7 +29,7 @@ export class SignUpComponent {
       this.signUpForm.value.password,
       this.signUpForm.value.checkPassword)
       .subscribe(() => {
-        alert("User registered successfully!");
+        this.router.navigate(['/login']);
       });
   };
 }

@@ -36,6 +36,11 @@ public class CartService : ICartService
 
     public async Task<CartDto?> GetCartById(int id)
     {
+        if (id <= 0)
+        {
+            throw new ArgumentException("Invalid cart id", nameof(id));
+        }
+
         var cart = await _cartRepo.GetCartById(id);
 
         if (cart is null)
@@ -221,24 +226,21 @@ public class CartService : ICartService
 
     public async Task StartPayment(int cartId)
     {
-        if (cartId == 0)
-        {
-            throw new ArgumentException("Invalid cart id", nameof(cartId));
-        }
-
-        var cart = await this.GetCartById(cartId);
-
-        if (cart == null)
-        {
-            throw new ArgumentException("Cart not found");
-        }
+        var cart = await _cartRepo.GetCartById(cartId) ?? throw new ArgumentException("Cart not found");
 
         if (cart.UserId == Guid.Empty)
         {
-            cart.UserId = GetCurrentUserId();
+            var currentUserId = GetCurrentUserId();
+
+            if (currentUserId == Guid.Empty)
+            {
+                throw new ArgumentException("User not found");
+            }
+
+            cart.UserId = currentUserId;
         }
 
-        ValidateUserProducts(cart.UserId, cart.Products.Select(p => p.Id));
+        ValidateUserProducts(cart.UserId, cart.Products.Select(p => p.ProductId));
 
         await _cartRepo.SaveChanges();
     }
@@ -250,8 +252,6 @@ public class CartService : ICartService
             return Guid.Empty;
         }
 
-        //var userId = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
-
         var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         return string.IsNullOrEmpty(userId) ? Guid.Empty : Guid.Parse(userId);
@@ -259,17 +259,14 @@ public class CartService : ICartService
 
     public async Task CompletePayment(int cartId)
     {
-        if (cartId == 0)
-        {
-            throw new ArgumentException("Invalid cart id", nameof(cartId));
-        }
-
-        var cart = await this.GetCartById(cartId);
+        var cart = await _cartRepo.GetCartById(cartId) ?? throw new ArgumentException("Cart not found");
+        _cartRepo.DeleteCart(cart);
+        await _cartRepo.SaveChanges();
 
         var purchaseCompletedEvent = new PurchaseCompletedEvent()
         {
             UserId = cart.UserId,
-            ProductIds = cart.Products.Select(p => p.Id),
+            ProductIds = cart.Products.Select(p => p.ProductId),
         };
 
         _messageBusClient.PublishPurchaseCompleted(purchaseCompletedEvent);

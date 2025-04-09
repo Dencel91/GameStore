@@ -14,7 +14,9 @@ namespace AuthService.Data
 
         Task AddUser(User user);
 
-        Task<bool> UserExists(string userName);
-        
+        Task<bool> UserNameExists(string userName);
+
+        Task<bool> EmailExists(string email);
+
     }
 }
