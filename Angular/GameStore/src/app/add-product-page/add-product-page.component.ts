@@ -4,6 +4,7 @@ import { ProductService } from '../services/product.service';
 import { Product } from '../interfaces/product';
 import { FileHandler } from '../interfaces/FileHandler';
 import { NgIf } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-add-product-page',
@@ -13,7 +14,7 @@ import { NgIf } from '@angular/common';
 })
 
 export class AddProductPageComponent {
-  constructor(private productService: ProductService) { }
+  constructor(private productService: ProductService, private router: Router) { }
 
   images: FileHandler[] = [];
   thumbnail: FileHandler | null = null;
@@ -72,7 +73,7 @@ export class AddProductPageComponent {
 
   submit() {
     this.productService.addProduct(this.addProductForm.value).subscribe((response: any) => {
-
+      this.router.navigate(['/product', response.id]);
     });
   }
 }

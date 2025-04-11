@@ -42,6 +42,11 @@ spec:
             secretKeyRef:
               name: authentication-key
               key: signing-key
+        - name: AzureStorageAccessKey
+          valueFrom:
+            secretKeyRef:
+              name: azure-storage-secret
+              key: access-key
         ports:
         - containerPort: 8080
 ---
