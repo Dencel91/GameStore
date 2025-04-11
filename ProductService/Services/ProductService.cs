@@ -2,6 +2,7 @@
 using ProductService.Data;
 using ProductService.DTOs;
 using ProductService.Models;
+using ProductService.Models.enums;
 
 namespace ProductService.Services;
 
@@ -12,15 +13,21 @@ public class ProductService : IProductService
     private readonly IProductRepo _productRepo;
     private readonly IProductReviewRepo _productReviewRepo;
     private readonly IMapper _mapper;
+    private readonly Lazy<IFileService> _fileService;
+    private readonly AppDbContext _dbContext;
 
     public ProductService(
         IProductRepo productRepo,
         IProductReviewRepo productReviewRepo,
-        IMapper mapper)
+        IMapper mapper,
+        Lazy<IFileService> fileService,
+        AppDbContext dbContext)
     {
         _productRepo = productRepo;
         _productReviewRepo = productReviewRepo;
         _mapper = mapper;
+        _fileService = fileService;
+        _dbContext = dbContext;
     }
 
     public async Task<GetProductsResponse> GetPagedProducts(int pageCursor, int pageSize)
@@ -66,12 +73,42 @@ public class ProductService : IProductService
     {
         ValidateCreateProductRequest(request);
 
-        var product = _mapper.Map<Product>(request);
+        var uploadedFiles = new List<ProductImage>();
 
-        await _productRepo.CreateProduct(product);
-        await _productRepo.SaveChanges();
+        using var transaction = await _dbContext.Database.BeginTransactionAsync();
+        try
+        {
+            var product = _mapper.Map<Product>(request);
+            await _productRepo.CreateProduct(product);
+            await _productRepo.SaveChanges();
 
-        return product;
+            var thumbnail = await UploadProductImage(request.Thumbnail!, product.Id, ImageType.Thumbnail);
+            product.ThumbnailUrl = thumbnail.Url;
+            uploadedFiles.Add(thumbnail);
+
+            foreach (var image in request.Images)
+            {
+                var productImage = await UploadProductImage(image, product.Id, ImageType.Preview);
+                uploadedFiles.Add(productImage);
+            }
+
+            _dbContext.ProductImages.AddRange(uploadedFiles);
+            await _productRepo.SaveChanges();
+            await transaction.CommitAsync();
+            return product;
+        }
+        catch (Exception)
+        {
+            await transaction.RollbackAsync();
+
+            foreach (var file in uploadedFiles)
+            {
+                await _fileService.Value.Delete(file.FullPath);
+            }
+
+            throw;
+
+        }
     }
 
     private static void ValidateCreateProductRequest(CreateProductRequest request)
@@ -83,10 +120,29 @@ public class ProductService : IProductService
             throw new ArgumentException("Price cannot be negative", nameof(request));
         }
 
-        if (request.ImageUrls.Count() < 3)
+        if (request.Images.Count() < 3)
         {
-            throw new ArgumentException("At least 3 images are required", nameof(request));
+            throw new ArgumentException("At least 3 preview images are required", nameof(request));
         }
+    }
+
+    private async Task<ProductImage> UploadProductImage(IFormFile image, int productId, ImageType imageType)
+    {
+        var imageId = Guid.NewGuid();
+        var filename = imageId.ToString() + Path.GetExtension(image.FileName);
+        var fullPath = Path.Combine(productId.ToString(), filename);
+
+        var imageUri = await _fileService.Value.Upload(fullPath, image);
+
+        return new ProductImage
+        {
+            Id = imageId,
+            Name = filename,
+            FullPath = fullPath,
+            Type = imageType,
+            Url = imageUri,
+            ProductId = productId
+        };
     }
 
     public Task<IEnumerable<Product>> GetProductsByIds(IEnumerable<int> ids)

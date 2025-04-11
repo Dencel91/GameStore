@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Product } from '../interfaces/product';
 import { environment } from '../../environments/environment';
+import { FileHandler } from '../interfaces/FileHandler';
 
 @Injectable({
   providedIn: 'root'
@@ -38,7 +39,16 @@ export class ProductService {
     return this.http.get<Product[]>(this.url + '/Search?searchText=' + searchText);
   }
 
-  AddProduct(product: Product): Observable<Product> {
-    return this.http.post<Product>(this.url, product);
+  addProduct(product: any): Observable<Product> {
+    const formData = new FormData();
+    formData.append('name', product.name);
+    formData.append('description', product.description);
+    formData.append('price', product.price);
+    formData.append('thumbnail', product.thumbnail.file);
+    product.images.forEach((image: FileHandler) => {
+      formData.append('images', image.file);
+    });
+
+    return this.http.post<Product>(this.url, formData);
   }
 }

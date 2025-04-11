@@ -44,7 +44,7 @@ public class ProductRepo : IProductRepo
 
     public Task<Product?> GetProductDetails(int id)
     {
-        return _context.Products.Include(p => p.Images.OrderBy(i => i.Order)).FirstOrDefaultAsync(p => p.Id == id);
+        return _context.Products.Include(p => p.Images).FirstOrDefaultAsync(p => p.Id == id);
     }
 
     public async Task<IEnumerable<Product>> SearchProduct(string searchText)

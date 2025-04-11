@@ -57,10 +57,24 @@ public class ProductsController : ControllerBase
     }
 
 
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult<ProductDto>> CreateProduct(CreateProductRequest createProductRequest)
     {
+        //foreach (var image in createProductRequest.Images)
+        //{
+        //    using (var stream = new FileStream($"C:\\Users\\Dencel\\test\\{image.FileName}", FileMode.Create))
+        //    {
+        //        await image.CopyToAsync(stream);
+        //    }
+        //}
+
+        //using (var stream = new FileStream($"C:\\Users\\Dencel\\test\\{createProductRequest.Thumbnail.FileName}", FileMode.Create))
+        //{
+        //    await createProductRequest.Thumbnail.CopyToAsync(stream);
+        //}
+
+        //return Ok();
         var product = await _productService.CreateProduct(createProductRequest);
         var productResponse = _mapper.Map<ProductDto>(product);
 

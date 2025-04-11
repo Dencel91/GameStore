@@ -5,17 +5,17 @@ namespace ProductService.DTOs;
 public class CreateProductRequest
 {
     [Required]
-    public required string Name { get; set; }
+    public string? Name { get; set; }
 
     [Required]
-    public required string Description { get; set; }
+    public string? Description { get; set; }
 
     [Required]
     public double Price { get; set; }
 
     [Required]
-    public required string ThumbnailUrl { get; set; }
+    public IFormFile? Thumbnail { get; set; }
 
     [Required]
-    public required IEnumerable<string> ImageUrls { get; set; }
+    public IEnumerable<IFormFile> Images { get; set; } = [];
 }

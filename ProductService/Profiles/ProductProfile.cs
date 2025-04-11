@@ -9,10 +9,11 @@ public class ProductProfile : Profile
     public ProductProfile()
     {
         CreateMap<Product, ProductDto>();
-        CreateMap<CreateProductRequest, Product>();
+        CreateMap<CreateProductRequest, Product>()
+            .ForMember(dest => dest.Images, opt => opt.Ignore());
         CreateMap<Product, GrpcProductModel>();
         CreateMap<CreateProductReviewRequest, ProductReview>();
         CreateMap<Product, ProductDetailsResponse>()
-            .ForMember(dist => dist.Images, opt => opt.MapFrom(product => product.Images.Select(i => i.ImageUrl)));
+            .ForMember(dist => dist.Images, opt => opt.MapFrom(product => product.Images.Where(i => i.Type == Models.enums.ImageType.Preview).Select(i => i.Url)));
     }
 }

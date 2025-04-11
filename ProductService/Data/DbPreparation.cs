@@ -11,7 +11,7 @@ public static class DbPreparation
         try
         {
             var context = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
-            context.Database.Migrate();
+            //context.Database.Migrate();
         }
         catch (Exception ex)
         {

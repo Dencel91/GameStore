@@ -19,9 +19,8 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Product>()
             .HasMany(p => p.Images)
             .WithOne(i => i.Product)
-            .HasForeignKey(i => i.ProductId);
-
-        modelBuilder.Entity<ProductImage>().HasKey(pi => new { pi.ProductId, pi.ImageUrl });
+            .HasForeignKey(i => i.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<ProductReview>().HasKey(pi => new { pi.ProductId, pi.UserId });
     }

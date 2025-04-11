@@ -1,21 +1,29 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using ProductService.Models.enums;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProductService.Models;
 
 public class ProductImage
 {
-    [Key, Column(Order = 0)]
+    [Key]
+    [Required]
+    public Guid Id { get; set; }
+
     [Required]
     public int ProductId { get; set; }
 
-    [Key, Column(Order = 1)]
     [Required]
-    public required string ImageUrl { get; set; }
+    public required string Name { get; set; }
 
     [Required]
-    public int Order { get; set; }
+    public required string FullPath { get; set; }
 
-    public virtual Product Product { get; set; }
+    [Required]
+    public ImageType Type { get; set; }
+
+    [Required]
+    public required string Url { get; set; }
+
+    public Product Product { get; set; }
 }

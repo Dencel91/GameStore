@@ -14,7 +14,9 @@ builder.Services.AddScoped<IProductRepo, ProductRepo>();
 builder.Services.AddScoped<IProductImageRepo, ProductImageRepo>();
 builder.Services.AddScoped<IProductReviewRepo, ProductReviewRepo>();
 
+builder.Services.AddTransient(typeof(Lazy<>), typeof(LazyResolver<>));
 builder.Services.AddScoped<IProductService, ProductService.Services.ProductService>();
+builder.Services.AddScoped<IFileService, AzureFileService>();
 
 builder.Services.AddGrpc();
 
@@ -65,3 +67,12 @@ app.MapGet("/protos/products.proto", () =>
 });
 
 app.Run();
+
+
+public class LazyResolver<T> : Lazy<T>
+{
+    public LazyResolver(IServiceProvider serviceProvider)
+        : base(() => serviceProvider.GetRequiredService<T>())
+    {
+    }
+}

@@ -18,10 +18,9 @@ public class Product
     [Required]
     public double Price { get; set; }
 
-    [Required]
-    public required string ThumbnailUrl { get; set; }
+    public string? ThumbnailUrl { get; set; }
 
-    public virtual ICollection<ProductImage> Images { get; set; } = [];
+    public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
 
     public virtual ICollection<ProductReview>? Reviews { get; set; } = [];
 }
