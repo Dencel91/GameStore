@@ -145,6 +145,98 @@ public class ProductService : IProductService
         };
     }
 
+    public async Task<Product> UpdateProduct(UpdateProductRequest request)
+    {
+        ValidateUpdateProductRequest(request);
+
+        var uploadedFiles = new List<ProductImage>();
+
+        using var transaction = await _dbContext.Database.BeginTransactionAsync();
+        try
+        {
+            var product = await _productRepo.GetProductDetails(request.ProductId)
+                ?? throw new ArgumentException("Product not found", nameof(request));
+
+            var newProduct = _mapper.Map<Product>(request);
+            
+            var imagesToRemove = product.Images
+                .Where(i => i.Type == ImageType.Preview)
+                .Select(i => i.Name)
+                .Except(request.Images.Select(i => i.Name))
+                .ToList();
+
+            var newImages = request.Images
+                .Where(i => !product.Images.Any(p => p.Name == i.Name))
+                .ToList();
+
+            //var imagesToRemove2 = product.Images
+            //    .Where(i => i.Type == ImageType.Preview);
+
+
+            var thumbnail = product.Images.First(i => i.Type == ImageType.Thumbnail);
+
+            if (request.Thumbnail!.Name != thumbnail.Name)
+            {
+                var newThumbnail = await UploadProductImage(request.Thumbnail!, newProduct.Id, ImageType.Thumbnail);
+                newProduct.ThumbnailUrl = newThumbnail.Url;
+                uploadedFiles.Add(newThumbnail);
+
+                imagesToRemove.Add(thumbnail.Name);
+            }
+
+            foreach (var image in newImages)
+            {
+                var productImage = await UploadProductImage(image, newProduct.Id, ImageType.Preview);
+                uploadedFiles.Add(productImage);
+            }
+
+            _dbContext.ProductImages.AddRange(uploadedFiles);
+            await _productRepo.SaveChanges();
+
+            foreach (var imageName in imagesToRemove)
+            {
+                var imageToRemove = product.Images.First(i => i.Name == imageName);
+                _dbContext.ProductImages.Remove(imageToRemove);
+                await _fileService.Value.Delete(imageToRemove.FullPath);
+            }
+
+            await transaction.CommitAsync();
+            return product;
+        }
+        catch (Exception)
+        {
+            await transaction.RollbackAsync();
+
+            foreach (var file in uploadedFiles)
+            {
+                await _fileService.Value.Delete(file.FullPath);
+            }
+
+            throw;
+
+        }
+    }
+
+    private void ValidateUpdateProductRequest(UpdateProductRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        if (request.ProductId <= 0)
+        {
+            throw new ArgumentException("Invalid product id", nameof(request));
+        }
+
+        if (request.Price < 0)
+        {
+            throw new ArgumentException("Price cannot be negative", nameof(request));
+        }
+
+        if (request.Images.Count() < 3)
+        {
+            throw new ArgumentException("At least 3 preview images are required", nameof(request));
+        }
+    }
+
     public Task<IEnumerable<Product>> GetProductsByIds(IEnumerable<int> ids)
     {
         return _productRepo.GetProductsByIds(ids);

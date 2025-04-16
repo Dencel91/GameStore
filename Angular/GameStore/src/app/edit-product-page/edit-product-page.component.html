@@ -1,1 +1,49 @@
-<p>edit-product-page works! {{productId}}</p>
+<div class="container">
+    <form [formGroup]="editProductForm" (ngSubmit)="submit()">
+        <div class="row mt-3">
+            <div class="col-4">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="nameInput" placeholder="Name" formControlName="name">
+                    <label for="nameInput">Name</label>
+                </div>
+
+                <div class="form-floating mb-3 mt-3">
+                    <textarea class="form-control" id="descriptionInput" placeholder="Description" formControlName="description" style="min-height: 150px;"></textarea>
+                    <label for="nameInput">Description</label>
+                </div>
+                
+                <div class="input-group mb-3">
+                    <span class="input-group-text">$</span>
+                    <div class="form-floating">
+                        <input type="number" class="form-control" id="priceInput" placeholder="Price" formControlName="price">
+                        <label for="nameInput">Price</label>
+                    </div>
+                </div>
+
+                <div class="input-group mb-3">
+                    <input type="file" class="form-control" id="thumbnailFileInput" accept="image/*" (change)="onThumbnailSelected($event)">
+                    <label class="input-group-text" for="thumbnailFileInput" >Thumbnail</label>
+                </div>
+                <img *ngIf="thumbnail" [src]="thumbnail.url" alt="Thumbnail" class="img-thumbnail mb-3">
+            </div>
+
+            <div class="col-6">
+                <div class="input-group mb-3">
+                    <input type="file" class="form-control" id="inputGroupFile02" accept="image/*" (change)="onImageSelected($event)">
+                    <label class="input-group-text" for="inputGroupFile02">Image</label>
+                </div>
+                <div class="row ">
+                @for(image of images; track image; let id = $index) {
+                    <div class="col-4 position-relative mb-3 pe-0">
+                        <span class="btn-delete position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" (click)="deleteImage(id)">
+                            X
+                        </span>
+                        <img [src]="image.url" alt="Image" class="img-thumbnail">
+                    </div>
+                }
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Add product</button>
+        </div>
+    </form>
+</div>

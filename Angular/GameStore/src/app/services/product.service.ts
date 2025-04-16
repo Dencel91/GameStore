@@ -51,4 +51,18 @@ export class ProductService {
 
     return this.http.post<Product>(this.url, formData);
   }
+
+  UpdateProduct(product: any): Observable<Product> {
+    const formData = new FormData();
+    formData.append('id', product.id);
+    formData.append('name', product.name);
+    formData.append('description', product.description);
+    formData.append('price', product.price);
+    formData.append('thumbnail', product.thumbnail.file);
+    product.images.forEach((image: FileHandler) => {
+      formData.append('images', image.file);
+    });
+
+    return this.http.put<Product>(this.url, formData);
+  }
 }
