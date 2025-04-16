@@ -2,7 +2,6 @@ import { Component, Input } from '@angular/core';
 import { Product } from '../interfaces/product';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { timer } from 'rxjs';
 
 @Component({
   selector: 'app-product-tile',

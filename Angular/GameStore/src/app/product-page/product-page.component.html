@@ -48,8 +48,6 @@
 
 <h1 *ngIf="!isLoading && !product"  class="position-absolute top-50 start-50 translate-middle">Product not found</h1>
 
-<div *ngIf="isLoading" class="position-absolute top-50 start-50 translate-middle">
-    <app-loading/>
-</div>
+<app-loading [loading]="isLoading" class="position-absolute top-50 start-50 translate-middle"/>
 
 <app-add-to-cart-modal [product]="product"></app-add-to-cart-modal>

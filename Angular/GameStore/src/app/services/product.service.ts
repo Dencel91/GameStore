@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Product } from '../interfaces/product';
 import { environment } from '../../environments/environment';
-import { FileHandler } from '../interfaces/FileHandler';
+import { FileHandler } from '../interfaces/fileHandler';
 
 @Injectable({
   providedIn: 'root'

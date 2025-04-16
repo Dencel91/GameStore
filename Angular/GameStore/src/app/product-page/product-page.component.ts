@@ -10,6 +10,7 @@ import { Cart } from '../interfaces/cart';
 import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
 import { LoadingComponent } from "../loading/loading.component";
+import { timer } from 'rxjs';
 
 @Component({
   selector: 'app-product-page',
@@ -29,27 +30,36 @@ export class ProductPageComponent {
     private productService: ProductService,
     private cartService: CartService,
     public authService: AuthService,
-    private userService: UserService) {}
+    private userService: UserService) { }
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
       const id = Number(params.get('id'));
+      this.getProductDetails(id);
+    });
+  }
 
-      this.productService.GetProductDetails(id).subscribe({
-        next: (data: any) =>{
+  getProductDetails(id: number) {
+    this.productService.GetProductDetails(id).subscribe({
+      next: (data: any) => {
+        timer(1000).subscribe(() => {
           this.product = data;
-          this.isLoading = false;
-        },
-        error: (error: any) => {
-          console.log('Cannot get product details', error);
-          this.isLoading = false;
-        }
-      });
 
-      if (this.authService.isAuthenticated()) {
-        this.userService.getUserProductInfo(id).subscribe((response: any) => {
-          this.userProductInfo = response;
-        });
+          if (this.authService.isAuthenticated()) {
+            this.userService.getUserProductInfo(id).subscribe((response: any) => {
+              this.userProductInfo = response;
+              this.isLoading = false;
+            });
+          }
+          else {
+            this.isLoading = false;
+          }
+        })
+
+      },
+      error: (error: any) => {
+        console.log('Cannot get product details', error);
+        this.isLoading = false;
       }
     });
   }
@@ -61,7 +71,7 @@ export class ProductPageComponent {
       },
       error: (error: any) => {
         if (error.status == 400) {
-          switch (error.error){
+          switch (error.error) {
             case 'Invalid cart id':
               this.cartService.cartId = 0;
               this.addToCart(id);
@@ -73,7 +83,8 @@ export class ProductPageComponent {
               break;
           }
         }
-      }});
+      }
+    });
   }
 
   addToLibrary() {

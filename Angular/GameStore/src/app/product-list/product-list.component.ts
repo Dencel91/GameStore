@@ -4,6 +4,7 @@ import { Product } from '../interfaces/product';
 import { ProductTileComponent } from "../product-tile/product-tile.component";
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { LoadingComponent } from '../loading/loading.component';
+import { timer } from 'rxjs';
 
 @Component({
   selector: 'app-product-list',
@@ -29,11 +30,14 @@ export class ProductListComponent {
   getProducts() {
     this.loading = true;
     this.productService.GetProducts(this.nextPageCursor, ProductListComponent.pageSize).subscribe((data) => {
-      let products: Product[] = data.products;
-      this.products = this.products.concat(products);
-      this.nextPageCursor = data.nextPageCursor;
-      this.allLoaded = (data.NextPageCursor == 0 || products?.length < ProductListComponent.pageSize);
-      this.loading = false;
+      timer(1000).subscribe( () => {
+        let products: Product[] = data.products;
+        this.products = this.products.concat(products);
+        this.nextPageCursor = data.nextPageCursor;
+        this.allLoaded = (data.NextPageCursor == 0 || products?.length < ProductListComponent.pageSize);
+        this.loading = false;
+      });
+
    });
   }
 

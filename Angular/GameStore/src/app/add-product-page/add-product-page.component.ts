@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ProductService } from '../services/product.service';
-import { Product } from '../interfaces/product';
-import { FileHandler } from '../interfaces/FileHandler';
+import { FileHandler } from '../interfaces/fileHandler';
 import { NgIf } from '@angular/common';
 import { Router } from '@angular/router';
 

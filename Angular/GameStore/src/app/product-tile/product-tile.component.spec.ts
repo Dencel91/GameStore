@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { ProductTileComponent } from './product-tile.component';
 
 describe('ProductTileComponent', () => {
