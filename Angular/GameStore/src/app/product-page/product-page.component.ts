@@ -4,17 +4,16 @@ import { ProductService } from '../services/product.service';
 import { Product } from '../interfaces/product';
 import { CartService } from '../services/cart.service';
 import { NgbCarouselModule } from '@ng-bootstrap/ng-bootstrap';
-import { CommonModule, NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { AddToCartModalComponent } from "../add-to-cart-modal/add-to-cart-modal.component";
 import { Cart } from '../interfaces/cart';
 import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
 import { LoadingComponent } from "../loading/loading.component";
-import { timer } from 'rxjs';
 
 @Component({
   selector: 'app-product-page',
-  imports: [NgbCarouselModule, NgIf, AddToCartModalComponent, CommonModule, LoadingComponent, LoadingComponent],
+  imports: [NgbCarouselModule, AddToCartModalComponent, CommonModule, LoadingComponent, LoadingComponent],
   templateUrl: './product-page.component.html',
   styleUrl: './product-page.component.css'
 })

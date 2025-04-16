@@ -34,7 +34,7 @@
                 <h2>Already in your library!</h2>
             }
 
-            <h3>Reviews:</h3>
+            <!-- <h3>Reviews:</h3>
 
             @for(review of product.reviews; track review)
             {
@@ -42,12 +42,12 @@
                 <p>{{review.date}}</p>
                 <p>{{review.isRecommended}}</p>
                 <p>{{review.reviewText}}</p>
-            }
+            } -->
+        }
+        @else {
+            <h1 class="position-absolute top-50 start-50 translate-middle">Product not found</h1>
         }
     </app-loading>
 </div>
 
-
-<h1 *ngIf="!isLoading && !product"  class="position-absolute top-50 start-50 translate-middle">Product not found</h1>
-
-<app-add-to-cart-modal [product]="product"></app-add-to-cart-modal>
+<app-add-to-cart-modal [product]="product"/>

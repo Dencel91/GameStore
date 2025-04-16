@@ -67,7 +67,7 @@ public class ProductsController : ControllerBase
         return CreatedAtRoute(nameof(GetProductById), new { product.Id }, productDto);
     }
 
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     [HttpPatch]
     public async Task<ActionResult<ProductDto>> UpdateProduct([FromForm] UpdateProductRequest request)
     {
