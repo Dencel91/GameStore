@@ -42,20 +42,17 @@ export class ProductPageComponent {
   getProductDetails(id: number) {
     this.productService.GetProductDetails(id).subscribe({
       next: (data: any) => {
-        timer(1000).subscribe(() => {
-          this.product = data;
+        this.product = data;
 
-          if (this.authService.isAuthenticated()) {
-            this.userService.getUserProductInfo(id).subscribe((response: any) => {
-              this.userProductInfo = response;
-              this.isLoading = false;
-            });
-          }
-          else {
+        if (this.authService.isAuthenticated()) {
+          this.userService.getUserProductInfo(id).subscribe((response: any) => {
+            this.userProductInfo = response;
             this.isLoading = false;
-          }
-        })
-
+          });
+        }
+        else {
+          this.isLoading = false;
+        }
       },
       error: (error: any) => {
         console.log('Cannot get product details', error);

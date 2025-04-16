@@ -2,13 +2,11 @@
   <div class="row" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="150"
     (scrolled)="onScrollDown()">
     @for(product of products; track product.id) {
-    <div class="col-6 col-lg-4 mt-3">
-      <app-product-tile [product]="product" />
-    </div>
+      <div class="col-6 col-lg-4 mt-3">
+        <app-product-tile [product]="product" />
+      </div>
     }
 
-    <!-- <div class="col-1 mt-3"> -->
-      <app-loading [loading]="loading" class="col-12 mt-3"/>
-    <!-- </div> -->
+    <app-loading [loading]="loading" loadingClass="col-12 mt-3"/>
   </div>
 </div>

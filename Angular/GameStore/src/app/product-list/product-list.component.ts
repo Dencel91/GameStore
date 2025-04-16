@@ -30,14 +30,11 @@ export class ProductListComponent {
   getProducts() {
     this.loading = true;
     this.productService.GetProducts(this.nextPageCursor, ProductListComponent.pageSize).subscribe((data) => {
-      timer(1000).subscribe( () => {
-        let products: Product[] = data.products;
-        this.products = this.products.concat(products);
-        this.nextPageCursor = data.nextPageCursor;
-        this.allLoaded = (data.NextPageCursor == 0 || products?.length < ProductListComponent.pageSize);
-        this.loading = false;
-      });
-
+      let products: Product[] = data.products;
+      this.products = this.products.concat(products);
+      this.nextPageCursor = data.nextPageCursor;
+      this.allLoaded = (data.NextPageCursor == 0 || products?.length < ProductListComponent.pageSize);
+      this.loading = false;
    });
   }
 

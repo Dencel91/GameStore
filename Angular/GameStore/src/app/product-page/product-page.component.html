@@ -1,53 +1,53 @@
 <div class="container">
-    @if(product){
-        <h1>{{product.name}}</h1>
-        @if (product.images && product.images.length > 0) {
-            <div class="row">
-                <div class="col">
-                    <ngb-carousel style="max-width: 600px;">
-                        @for(imageUrl of product.images; track imageUrl){
-                            <ng-template ngbSlide>
-                                <div class="picsum-img-wrapper">
-                                    <img [src]="imageUrl" />
-                                </div>
-                            </ng-template>
-                        }
-                    </ngb-carousel>
+    <app-loading [loading]="isLoading" loadingClass="position-absolute top-50 start-50 translate-middle">
+        @if(product){
+            <h1>{{product.name}}</h1>
+            @if (product.images && product.images.length > 0) {
+                <div class="row">
+                    <div class="col">
+                        <ngb-carousel style="max-width: 600px;">
+                            @for(imageUrl of product.images; track imageUrl){
+                                <ng-template ngbSlide>
+                                    <div class="picsum-img-wrapper">
+                                        <img [src]="imageUrl" />
+                                    </div>
+                                </ng-template>
+                            }
+                        </ngb-carousel>
+                    </div>
+                    <div class="col-4">
+                        <img class="img-thumbnail" src={{product.thumbnailUrl}} />
+                        <p>{{product.description}}</p>
+                        <p>Reviews: Good</p>
+                        <p>Releace date: 20.10.2016</p>
+                    </div>
                 </div>
-                <div class="col-4">
-                    <img class="img-thumbnail" src={{product.thumbnailUrl}} />
-                    <p>{{product.description}}</p>
-                    <p>Reviews: Good</p>
-                    <p>Releace date: 20.10.2016</p>
-                </div>
-            </div>
-        }
+            }
 
-        @if(!this.authService.isAuthenticated() || !this.userProductInfo?.owned){
-            @if(product.price > 0) {
-                {{product.price | currency}} <button type="button" class="btn btn-primary" (click)="addToCart(product.id!)">Add to Cart</button>
+            @if(!this.authService.isAuthenticated() || !this.userProductInfo?.owned){
+                @if(product.price > 0) {
+                    {{product.price | currency}} <button type="button" class="btn btn-primary" (click)="addToCart(product.id!)">Add to Cart</button>
+                } @else {
+                    <button type="button" class="btn btn-primary" (click)="addToLibrary()">Add to Library</button>
+                }  
             } @else {
-                <button type="button" class="btn btn-primary" (click)="addToLibrary()">Add to Library</button>
-            }  
-        } @else {
-            <h2>Already in your library!</h2>
-        }
+                <h2>Already in your library!</h2>
+            }
 
-        <h3>Reviews:</h3>
+            <h3>Reviews:</h3>
 
-        @for(review of product.reviews; track review)
-        {
-            <p>{{review.userName}}</p>
-            <p>{{review.date}}</p>
-            <p>{{review.isRecommended}}</p>
-            <p>{{review.reviewText}}</p>
+            @for(review of product.reviews; track review)
+            {
+                <p>{{review.userName}}</p>
+                <p>{{review.date}}</p>
+                <p>{{review.isRecommended}}</p>
+                <p>{{review.reviewText}}</p>
+            }
         }
-    }
+    </app-loading>
 </div>
 
 
 <h1 *ngIf="!isLoading && !product"  class="position-absolute top-50 start-50 translate-middle">Product not found</h1>
-
-<app-loading [loading]="isLoading" class="position-absolute top-50 start-50 translate-middle"/>
 
 <app-add-to-cart-modal [product]="product"></app-add-to-cart-modal>

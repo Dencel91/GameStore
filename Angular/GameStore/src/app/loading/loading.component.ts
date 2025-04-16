@@ -9,5 +9,5 @@ import { Component, Input } from '@angular/core';
 })
 export class LoadingComponent {
   @Input() loading: boolean = false;
-  @Input() class: string = '';
+  @Input() loadingClass: string = '';
 }
