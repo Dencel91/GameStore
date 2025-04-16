@@ -33,9 +33,17 @@
                     <label class="input-group-text" for="inputGroupFile02">Image</label>
                 </div>
                 <div class="row ">
-                @for(image of images; track image; let id = $index) {
+                @for(image of existedImages; track image; let id = $index) {
                     <div class="col-4 position-relative mb-3 pe-0">
-                        <span class="btn-delete position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" (click)="deleteImage(id)">
+                        <span class="btn-delete position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" (click)="deleteExistedImage(id)">
+                            X
+                        </span>
+                        <img [src]="image.url" alt="Image" class="img-thumbnail">
+                    </div>
+                }
+                @for(image of newImages; track image; let id = $index) {
+                    <div class="col-4 position-relative mb-3 pe-0">
+                        <span class="btn-delete position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" (click)="deleteNewImage(id)">
                             X
                         </span>
                         <img [src]="image.url" alt="Image" class="img-thumbnail">
@@ -43,7 +51,7 @@
                 }
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Add product</button>
+            <button type="submit" class="btn btn-primary">Update product</button>
         </div>
     </form>
 </div>

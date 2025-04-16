@@ -13,7 +13,7 @@ export class ProductListComponent {
 
   constructor(private productService: ProductService) { }
   
-  static readonly pageSize: number = 3;
+  static readonly pageSize: number = 12;
 
   products: Product[] = [];
   nextPageCursor: number = 0;

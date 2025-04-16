@@ -92,7 +92,7 @@ public class ProductService : IProductService
                 uploadedFiles.Add(productImage);
             }
 
-            _dbContext.ProductImages.AddRange(uploadedFiles);
+            await _dbContext.ProductImages.AddRangeAsync(uploadedFiles);
             await _productRepo.SaveChanges();
             await transaction.CommitAsync();
             return product;
@@ -107,7 +107,6 @@ public class ProductService : IProductService
             }
 
             throw;
-
         }
     }
 
@@ -157,47 +156,46 @@ public class ProductService : IProductService
             var product = await _productRepo.GetProductDetails(request.ProductId)
                 ?? throw new ArgumentException("Product not found", nameof(request));
 
-            var newProduct = _mapper.Map<Product>(request);
-            
-            var imagesToRemove = product.Images
-                .Where(i => i.Type == ImageType.Preview)
-                .Select(i => i.Name)
-                .Except(request.Images.Select(i => i.Name))
-                .ToList();
+            product.Name = request.Name;
+            product.Description = request.Description;
+            product.Price = request.Price;
 
-            var newImages = request.Images
-                .Where(i => !product.Images.Any(p => p.Name == i.Name))
-                .ToList();
-
-            //var imagesToRemove2 = product.Images
-            //    .Where(i => i.Type == ImageType.Preview);
-
-
-            var thumbnail = product.Images.First(i => i.Type == ImageType.Thumbnail);
-
-            if (request.Thumbnail!.Name != thumbnail.Name)
+            foreach (var image in request.NewImages)
             {
-                var newThumbnail = await UploadProductImage(request.Thumbnail!, newProduct.Id, ImageType.Thumbnail);
-                newProduct.ThumbnailUrl = newThumbnail.Url;
-                uploadedFiles.Add(newThumbnail);
-
-                imagesToRemove.Add(thumbnail.Name);
-            }
-
-            foreach (var image in newImages)
-            {
-                var productImage = await UploadProductImage(image, newProduct.Id, ImageType.Preview);
+                var productImage = await UploadProductImage(image, product.Id, ImageType.Preview);
                 uploadedFiles.Add(productImage);
             }
 
-            _dbContext.ProductImages.AddRange(uploadedFiles);
+            var imagesToRemove = new List<ProductImage>();
+            foreach (var imageUrl in request.RemovedImages)
+            {
+                var image = product.Images.First(i => i.Url == imageUrl);
+                imagesToRemove.Add(image);
+                product.Images.Remove(image);
+            }
+
+            if (request.UpdatedThumbnail != null)
+            {
+                var existedThumbnail = product.Images.FirstOrDefault(i => i.Type == ImageType.Thumbnail);
+
+                if (existedThumbnail != null)
+                {
+                    imagesToRemove.Add(existedThumbnail);
+                    product.Images.Remove(existedThumbnail);
+                }
+
+                var newThumbnail = await UploadProductImage(request.UpdatedThumbnail, product.Id, ImageType.Thumbnail);
+                product.ThumbnailUrl = newThumbnail.Url;
+                uploadedFiles.Add(newThumbnail);
+            }
+
+            await _dbContext.ProductImages.AddRangeAsync(uploadedFiles);
+
             await _productRepo.SaveChanges();
 
-            foreach (var imageName in imagesToRemove)
+            foreach (var image in imagesToRemove)
             {
-                var imageToRemove = product.Images.First(i => i.Name == imageName);
-                _dbContext.ProductImages.Remove(imageToRemove);
-                await _fileService.Value.Delete(imageToRemove.FullPath);
+                await _fileService.Value.Delete(image.FullPath);
             }
 
             await transaction.CommitAsync();
@@ -213,7 +211,6 @@ public class ProductService : IProductService
             }
 
             throw;
-
         }
     }
 
@@ -231,10 +228,10 @@ public class ProductService : IProductService
             throw new ArgumentException("Price cannot be negative", nameof(request));
         }
 
-        if (request.Images.Count() < 3)
-        {
-            throw new ArgumentException("At least 3 preview images are required", nameof(request));
-        }
+        //if (request.Images.Count() < 3)
+        //{
+        //    throw new ArgumentException("At least 3 preview images are required", nameof(request));
+        //}
     }
 
     public Task<IEnumerable<Product>> GetProductsByIds(IEnumerable<int> ids)

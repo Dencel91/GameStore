@@ -1,12 +1,9 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { Product } from '../interfaces/product';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../services/product.service';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { FileHandler } from '../interfaces/FileHandler';
 import { NgIf } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-edit-product-page',
@@ -16,20 +13,24 @@ import { Observable } from 'rxjs';
 })
 export class EditProductPageComponent {
 
-  constructor(private route: ActivatedRoute, private productService: ProductService, private http: HttpClient) { }
+  constructor(
+    private route: ActivatedRoute,
+    private productService: ProductService,
+    private router: Router) { }
 
   thumbnail: FileHandler | null = null;
-  images: FileHandler[] = [];
+  existedImages: FileHandler[] = [];
   newImages: FileHandler[] = [];
-  removedImages: FileHandler[] = [];
+  removedImages: string[] = [];
 
   editProductForm = new FormGroup({
+    id: new FormControl<number>(0),
     name: new FormControl<string>(''),
     description: new FormControl<string>(''),
     price: new FormControl<number>(0),
     updatedThumbnail: new FormControl<FileHandler | null>(null),
     newImages: new FormControl<FileHandler[]>(this.newImages),
-    removedImages: new FormControl<FileHandler[]>(this.removedImages),
+    removedImages: new FormControl<string[]>([]),
   });
 
   ngOnInit() {
@@ -38,18 +39,12 @@ export class EditProductPageComponent {
 
       this.productService.GetProductDetails(productId).subscribe(product => {
 
-        // const file = this.urlToFile(product.thumbnailUrl, 'image.jpg', 'image/jpeg').then((file) => {
-        //   this.thumbnail = {
-        //     file: file,
-        //     url: product.thumbnailUrl
-        //   };
-        // });
-        // this.urlToFile2(product.thumbnailUrl, 'image.jpg', 'image/jpeg');
+        this.thumbnail = {
+          file: {} as File,
+          url: product.thumbnailUrl
+        };
 
-
-
-
-        this.images = product.images.map((imageUrl: string) => {
+        this.existedImages = product.images.map((imageUrl: string) => {
           return {
             file: {} as File,
             url: imageUrl
@@ -57,20 +52,11 @@ export class EditProductPageComponent {
         });
 
         this.editProductForm.patchValue({
+          id: product.id,
           name: product.name,
           description: product.description,
           price: product.price,
         });
-
-        // this.editProductForm.setValue({
-        //   name: product.name,
-        //   description: product.description,
-        //   price: product.price,
-        //   updatedThumbnail: null,
-        //   newImages: null,
-        //   removedImages: null
-        // });
-
       });
     });
   }
@@ -96,23 +82,6 @@ export class EditProductPageComponent {
     }
   }
 
-  // async urlToFile(url: string, filename: string, mimeType?: string): Promise<File> {
-  //   const response = await fetch(url);
-  //   const blob = await response.blob();
-  //   return new File([blob], filename, { type: mimeType || blob.type });
-  // }
-
-  // urlToFile2(url: string, filename: string, mimeType?: string): void {
-    
-  //   this.http.get(url, { responseType: 'blob' }).subscribe((blob) => {
-  //     const file = new File([blob], filename, { type: mimeType || blob.type });
-  //     this.thumbnail = {
-  //       file: file,
-  //       url: url
-  //     };
-  //   });
-  // }
-
   onImageSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files) {
@@ -126,22 +95,26 @@ export class EditProductPageComponent {
           url: e.target?.result as string
         }
 
-        this.images.push(fileHandler);
         this.newImages.push(fileHandler);
-
       };
 
       reader.readAsDataURL(image); 
     }
   }
 
-  deleteImage(id: number) {
-    this.images.splice(id, 1);
+  deleteExistedImage(id: number) {
+    this.removedImages.push(this.existedImages[id].url as string);
+    this.existedImages.splice(id, 1);
+  }
+
+  deleteNewImage(id: number) {
+    this.newImages.splice(id, 1);
   }
 
   submit() {
+    this.editProductForm.patchValue({ removedImages: this.removedImages });
     this.productService.UpdateProduct(this.editProductForm.value).subscribe((response: any) => {
-      
+      this.router.navigate(['/product', response.id]);
     });
   }
 }

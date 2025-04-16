@@ -54,15 +54,21 @@ export class ProductService {
 
   UpdateProduct(product: any): Observable<Product> {
     const formData = new FormData();
-    formData.append('id', product.id);
+    formData.append('productId', product.id);
     formData.append('name', product.name);
     formData.append('description', product.description);
     formData.append('price', product.price);
-    formData.append('thumbnail', product.thumbnail.file);
-    product.images.forEach((image: FileHandler) => {
-      formData.append('images', image.file);
+    if (product.updatedThumbnail) {
+      formData.append('UpdatedThumbnail', product.updatedThumbnail.file);
+    }
+    product.newImages.forEach((image: FileHandler) => {
+      formData.append('newImages', image.file);
     });
 
-    return this.http.put<Product>(this.url, formData);
+    product.removedImages.forEach((url: string, index: number) => {
+      formData.append(`removedImages[${index}]`, url);
+    });
+
+    return this.http.patch<Product>(this.url, formData);
   }
 }

@@ -62,19 +62,19 @@ public class ProductsController : ControllerBase
     public async Task<ActionResult<ProductDto>> CreateProduct(CreateProductRequest request)
     {
         var product = await _productService.CreateProduct(request);
-        var productResponse = _mapper.Map<ProductDto>(product);
+        var productDto = _mapper.Map<ProductDto>(product);
 
-        return CreatedAtRoute(nameof(GetProductById), new { product.Id }, productResponse);
+        return CreatedAtRoute(nameof(GetProductById), new { product.Id }, productDto);
     }
 
-    [Authorize(Roles = "Admin")]
-    [HttpPut]
-    public async Task<ActionResult<ProductDto>> UpdateProduct(UpdateProductRequest request)
+    //[Authorize(Roles = "Admin")]
+    [HttpPatch]
+    public async Task<ActionResult<ProductDto>> UpdateProduct([FromForm] UpdateProductRequest request)
     {
         var product = await _productService.UpdateProduct(request);
-        var productResponse = _mapper.Map<ProductDto>(product);
+        var productDto = _mapper.Map<ProductDto>(product);
 
-        return CreatedAtRoute(nameof(GetProductById), new { product.Id }, productResponse);
+        return Ok(productDto);
     }
 
     [HttpPost("AddReview")]

@@ -16,9 +16,11 @@ public class UpdateProductRequest
     [Required]
     public double Price { get; set; }
 
-    [Required]
-    public IFormFile? Thumbnail { get; set; }
+    //[Required]
+    public IFormFile? UpdatedThumbnail { get; set; }
 
-    [Required]
-    public IEnumerable<IFormFile> Images { get; set; } = [];
+    //[Required]
+    public IEnumerable<IFormFile> NewImages { get; set; } = [];
+
+    public IList<string> RemovedImages { get; set; } = [];
 }
