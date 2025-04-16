@@ -1,16 +1,25 @@
-
 @if (product) {
-    <div class="card">
-        <a routerLink="/product/{{product.id}}">
-            <img src="{{product.thumbnailUrl}}" class="card-img-top">
-        </a>
-        <div>
-            @if(product.price === 0){
-                Free
-            }
-            @else {
-                {{product.price | currency}}
-            }
-        </div>
-      </div>
+<div class="card">
+    <a routerLink="/product/{{product.id}}">
+        <img src="{{product.thumbnailUrl}}" class="card-img-top img-placeholder">
+    </a>
+    <div>
+        @if(product.price === 0){
+        Free
+        }
+        @else {
+        {{product.price | currency}}
+        }
+    </div>
+</div>
+}
+@else {
+<div class="card" aria-hidden="true">
+    <img class="card-img-top img-placeholder">
+    <div>
+        <p class="card-text placeholder-glow">
+            <span class="placeholder col-2"></span>
+        </p>
+    </div>
+</div>
 }

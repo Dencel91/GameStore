@@ -1,14 +1,16 @@
 <div class="container text-center">
-    <div class="row">
-      @for(product of products; track product.id) {
-        <div class="col-6 col-lg-4 mt-3">
-          <app-product-tile [product]="product"/>
-        </div>
-      }
+  <div class="row" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="150"
+    (scrolled)="onScrollDown()">
+    @for(product of products; track product.id) {
+    <div class="col-6 col-lg-4 mt-3">
+      <app-product-tile [product]="product" />
+    </div>
+    }
 
-      </div>
-      @if (!allProductsLoaded) {
-        <br>
-        <button type="button" class="btn btn-primary btn-lg btn-block" (click)="getProducts()">Load More</button>
-      }
+    @if(loading) {
+    <div class="col-12 mt-3">
+      <app-loading></app-loading>
+    </div>
+    }
   </div>
+</div>

@@ -1,23 +1,47 @@
-<nav class="navbar navbar-expand-md bg-body-tertiary">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#">GameStore</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link" aria-current="page" routerLinkActive="active"  routerLink="/store">Store</a>
-        </li>
-        @if(this.authService.isLoggedIn) {
-          @if(this.authService.isAdmin()) {
-            <li class="nav-item">
-              <button class="nav-link" (click)="showAdminPanel()">Admin</button>
-            </li>
-            <li class="nav-item">
-              <button class="nav-link" (click)="logout()">Log out</button>
-            </li>
-          } @else {
+<div class="sticky-top">
+  <nav class="navbar navbar-expand-md bg-body-tertiary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">GameStore</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" routerLinkActive="active"  routerLink="/store">Store</a>
+          </li>
+          @if(this.authService.isLoggedIn) {
+            @if(this.authService.isAdmin()) {
+              <li class="nav-item">
+                <button class="nav-link" (click)="showAdminPanel()">Admin</button>
+              </li>
+              <li class="nav-item">
+                <button class="nav-link" (click)="logout()">Log out</button>
+              </li>
+            } @else {
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" routerLinkActive="active" routerLink="/cart">
+                  Cart
+                  @if(this.cartService!.cartItemCount > 0) {
+                    <span class="badge rounded-pill text-bg-primary">{{this.cartService!.cartItemCount}}</span>
+                  }
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" routerLinkActive="active" routerLink="/library">Library</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false">{{this.authService.userName}} </a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" routerLink="/profile">Profile</a></li>
+                  <li><a class="dropdown-item" href="#">Friends</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <button class="dropdown-item" (click)="logout()">Log out</button>
+                </ul>
+              </li>
+            }
+          }
+          @else {
             <li class="nav-item">
               <a class="nav-link" aria-current="page" routerLinkActive="active" routerLink="/cart">
                 Cart
@@ -26,44 +50,22 @@
                 }
               </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" aria-current="page" routerLinkActive="active" routerLink="/library">Library</a>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false">{{this.authService.userName}} </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" routerLink="/profile">Profile</a></li>
-                <li><a class="dropdown-item" href="#">Friends</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <button class="dropdown-item" (click)="logout()">Log out</button>
-              </ul>
+            <!-- <li class="nav-item">
+              <button class="nav-link" (click)="showLoginModal()">Log in</button>
+            </li> -->
+            <li>
+              <a class="nav-link" aria-current="page" routerLinkActive="active" routerLink="/login">Sign in</a>
             </li>
           }
-        }
-        @else {
-          <li class="nav-item">
-            <a class="nav-link" aria-current="page" routerLinkActive="active" routerLink="/cart">
-              Cart
-              @if(this.cartService!.cartItemCount > 0) {
-                <span class="badge rounded-pill text-bg-primary">{{this.cartService!.cartItemCount}}</span>
-              }
-            </a>
-          </li>
-          <!-- <li class="nav-item">
-            <button class="nav-link" (click)="showLoginModal()">Log in</button>
-          </li> -->
-          <li>
-            <a class="nav-link" aria-current="page" routerLinkActive="active" routerLink="/login">Sign in</a>
-          </li>
-        }
-      </ul>
-      <form class="d-flex" role="search">
-        <input class="form-control me-2" #searchInput type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success" (click)="searchProduct(searchInput.value)">Search</button>
-      </form>
+        </ul>
+        <form class="d-flex" role="search">
+          <input class="form-control me-2" #searchInput type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" (click)="searchProduct(searchInput.value)">Search</button>
+        </form>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
+</div>
 
 <app-login-modal/>
 <app-admin-panel/>

@@ -9,10 +9,11 @@ import { AddToCartModalComponent } from "../add-to-cart-modal/add-to-cart-modal.
 import { Cart } from '../interfaces/cart';
 import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
+import { LoadingComponent } from "../loading/loading.component";
 
 @Component({
   selector: 'app-product-page',
-  imports: [NgbCarouselModule, NgIf, AddToCartModalComponent, CommonModule],
+  imports: [NgbCarouselModule, NgIf, AddToCartModalComponent, CommonModule, LoadingComponent, LoadingComponent],
   templateUrl: './product-page.component.html',
   styleUrl: './product-page.component.css'
 })
