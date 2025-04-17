@@ -2,32 +2,54 @@
     <div class="row justify-content-center m-3">
         <div class="col max-col-width">
             <h1 class="text-center mb-3">Checkout</h1>
-            <select class="form-select mb-3" [(ngModel)]="paymentMethod">
-                <option value = 0>Choose payment method</option>
-                <option value = 1>Credit or Debit Card</option>
+            <select class="form-select mb-3" [(ngModel)]="paymentMethod" (ngModelChange)="paymentMethod = +$event">
+                <option [value] = "0">Choose payment method</option>
+                <option [value] = "1">Credit or Debit Card</option>
             </select>
 
             @if (paymentMethod == 1) {
             
-                <form>
-                    <input type="text" pattern="^(?:4[0-9]{12}(?:[0-9]{3})?|[25][1-7][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$"
-                        class="form-control mb-3" id="floatingInput" placeholder="0000 0000 0000 0000">
+                <form [formGroup]="creditCardForm" (ngSubmit)="submit()" class="needs-validation" novalidate>
+                    <input type="text"
+                        class="form-control mb-3"
+                        id="floatingInput"
+                        (input)="onCardInput($event)"
+                        placeholder="0000 0000 0000 0000"
+                        formControlName="cardNumber"
+                        [class.is-invalid]="cartNumber?.touched && cartNumber?.invalid"
+                        [class.is-valid]="cartNumber?.touched && cartNumber?.valid"
+                        >
 
                     <div class="row mb-3">
                         <div class="col">
                             <div class="input-group ">
-                                <input type="number" class="form-control" placeholder="MM" aria-label="Month" max="12" min="1">
-                                <input type="number" class="form-control" placeholder="YY" aria-label="Year" max="99" min="0">
+                                <input type="text" class="form-control" placeholder="MM" aria-label="Month" max="12" min="1" maxlength="2"
+                                    formControlName="month"
+                                    (input)="onMonthInput($event)"
+                                    [class.is-invalid]="creditCardForm.get('month')?.touched && creditCardForm.get('month')?.invalid"
+                                    [class.is-valid]="creditCardForm.get('month')?.touched && creditCardForm.get('month')?.valid">
+                                <input type="text" class="form-control" placeholder="YY" aria-label="Year" max="99" min="0" maxlength="2" minlength="2"
+                                    formControlName="year"
+                                    (input)="onYearInput($event)"
+                                    [class.is-invalid]="creditCardForm.get('year')?.touched && creditCardForm.get('year')?.invalid"
+                                    [class.is-valid]="creditCardForm.get('year')?.touched && creditCardForm.get('year')?.valid">
                             </div>
                         </div>
                         <div class="col">
-                            <input type="number" class="form-control" placeholder="CVC" min="1" max="999" aria-label="CVC">
+                            <input type="text" class="form-control" placeholder="CVC" aria-label="CVC" min="1" max="999" maxlength="3"
+                                formControlName="cvc"
+                                (input)="onCvcInput($event)"
+                                [class.is-invalid]="creditCardForm.get('cvc')?.touched && creditCardForm.get('cvc')?.invalid"
+                                [class.is-valid]="creditCardForm.get('cvc')?.touched && creditCardForm.get('cvc')?.valid">
                         </div>
                     </div>
 
-                    <input type="text" class="form-control mb-3" placeholder="Cardholder's name" aria-label="Cardholder's name">
+                    <input type="text" class="form-control mb-3" placeholder="Cardholder's name" aria-label="Cardholder's name"
+                        formControlName="ownerName"
+                        [class.is-invalid]="creditCardForm.get('ownerName')?.touched && creditCardForm.get('ownerName')?.invalid"
+                        [class.is-valid]="creditCardForm.get('ownerName')?.touched && creditCardForm.get('ownerName')?.valid">
                     
-                    <input type="submit" class="btn btn-primary w-100 mb-3" value="Purchase" (click)="completePayment()">
+                    <input type="submit" class="btn btn-primary w-100 mb-3" value="Purchase" (click)="submit()">
 
                     <div class="alert alert-info" role="alert">
                         <strong>Note:</strong> This is a demo payment form. No real transactions will be processed.

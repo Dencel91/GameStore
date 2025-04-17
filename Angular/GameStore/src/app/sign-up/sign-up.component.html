@@ -2,42 +2,66 @@
     <div class="row justify-content-center mt-3">
         <div class="col max-col-width justify-content-center">
             <h1 class="text-center mb-3">Sign up</h1>
-            <form [formGroup]="signUpForm" (ngSubmit)="submit()">
+            <form [formGroup]="signUpForm" (ngSubmit)="submit()" class="needs-validation" novalidate>
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="userNameInput" placeholder="User name" formControlName="userName">
+                    <input type="text" class="form-control" id="userNameInput" placeholder="User name"
+                        formControlName="userName"
+                        [class.is-invalid]="username?.touched && username?.invalid"
+                        [class.is-valid]="username?.touched && username?.valid">
+                    <div class="invalid-feedback">
+                        Please provide a user name.
+                    </div>
                     <label for="userNameInput">User name</label>
                 </div>
 
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="EmailInput" placeholder="Email" formControlName="email">
+                    <input type="text" class="form-control" id="EmailInput" placeholder="Email" formControlName="email"
+                    [class.is-invalid]="email?.touched && email?.invalid"
+                    [class.is-valid]="email?.touched && email?.valid">
+                    <div class="invalid-feedback">
+                        Please provide a valid email.
+                    </div>
                     <label for="userNameInput">Email</label>
                 </div>
 
                 <div class="input-group">
                     <div class="form-floating mb-3">
-                        <input type="password" class="form-control" id="passwordInput" placeholder="Password" formControlName="password">
+                        <input type="password" class="form-control" id="passwordInput" placeholder="Password"
+                            formControlName="password"
+                            [class.is-invalid]="password?.touched && password?.invalid"
+                            [class.is-valid]="password?.touched && password?.valid">
+                            <div class="invalid-feedback">
+                                Please provide a valid password.
+                            </div>
                         <label for="passwordInput">Password</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="password" class="form-control" id="checkPasswordInput" placeholder="Check password" formControlName="checkPassword">
+                        <input type="password" class="form-control" id="checkPasswordInput" placeholder="Check password"
+                            formControlName="checkPassword"
+                            [class.is-invalid]="checkPassword?.touched && checkPassword?.invalid"
+                            [class.is-valid]="checkPassword?.touched && checkPassword?.valid">
+                            <div class="invalid-feedback">
+                                Please repeat the password.
+                            </div>
                         <label for="checkPasswordInput">Check password</label>
                     </div>
                 </div>
-                
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="AgreeCheckbox" required formControlName="agreed">
-                        <label class="form-check-label" for="AgreeCheckbox">
-                            Agree to terms and conditions
-                        </label>
-                        <div class="invalid-feedback">
-                            You must agree before submitting.
-                        </div>
-                    </div>
 
-                <br>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" value="" id="AgreeCheckbox" required
+                        formControlName="agreed"
+                        [class.is-invalid]="agreed?.touched && agreed?.invalid"
+                        [class.is-valid]="agreed?.touched && agreed?.valid">
+                    <label class="form-check-label" for="AgreeCheckbox">
+                        Agree to terms and conditions
+                    </label>
+                    <div class="invalid-feedback">
+                        You must agree before submitting.
+                    </div>
+                </div>
 
                 <div class="col">
-                    <button class="btn btn-primary w-100" type="submit">Register</button>
+                    <button class="btn btn-primary w-100" type="submit">Sign up</button>
                 </div>
             </form>
         </div>

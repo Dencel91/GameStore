@@ -60,12 +60,15 @@ export class AuthService {
   private loginSubject = new BehaviorSubject<boolean>(false);
   public loginEvent$ = this.loginSubject.asObservable();
 
-  login(username: string, password: string) {
-    this.http.post(this.url + '/login', {username, password}).subscribe((response: any) => {
-      this.setAuthInfo(response);
+  login(username: string, password: string): Observable<any> {
+    return this.http.post(this.url + '/login', { username, password }).pipe(
+      map((response: any) => {
+        this.setAuthInfo(response);
+        this.loginSubject.next(true);
 
-      this.loginSubject.next(true);
-    });
+        return response;
+      })
+    );
   }
 
   googleLogin(credential: string): Observable<any> {

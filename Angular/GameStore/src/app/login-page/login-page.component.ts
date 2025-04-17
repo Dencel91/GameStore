@@ -1,5 +1,5 @@
 import { Component, inject, signal, TemplateRef, ViewChild, WritableSignal } from '@angular/core';
-import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbModal, NgbModalRef, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { CredentialResponse } from 'google-one-tap';
 import { AuthService } from '../services/auth.service';
@@ -16,11 +16,20 @@ export class LoginPageComponent {
   constructor(private router: Router, private authService: AuthService) { }
 
   googleClientId: string = '1025391897494-kcsdhm4qvkftht1amto3h4qtd1vh0tmk.apps.googleusercontent.com';
+  error: string = '';
 
   loginForm = new FormGroup({
-    userName: new FormControl(),
-    password: new FormControl(),
+    userName: new FormControl<string>('', [Validators.required]),
+    password: new FormControl<string>('', [Validators.required]),
   });
+
+  get username() {
+    return this.loginForm.get("userName");
+  }
+
+  get password() {
+    return this.loginForm.get("password");
+  }
   
   ngOnInit() {
     this.initializeGoogleSignIn();
@@ -53,7 +62,23 @@ export class LoginPageComponent {
   }
 
   login() {
-    this.authService.login(this.loginForm.value.userName, this.loginForm.value.password);
-    this.router.navigate(['/store']);
+    if (!this.loginForm.valid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
+
+    this.authService.login(this.loginForm.value.userName!, this.loginForm.value.password!).subscribe({
+      next:(() => {
+        this.router.navigate(['/store']);
+      }),
+      error: ((error) => {
+        if (error.status === 400 && typeof error.error === 'string') {
+          this.error = error.error;
+        }
+        else {
+          console.log(error);
+        }
+      })
+    });
   }
 }
