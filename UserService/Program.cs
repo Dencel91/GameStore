@@ -5,16 +5,17 @@ using UserService.DataServices.Grpc;
 using UserService.DataServices.MessageBus;
 using UserService.DataServices.MessageBus.EventProcessing;
 using UserService.Extensions;
-using UserService.Infrastructure;
+using GameStore.Common.Infrastructure;
 using UserService.Services;
 using UserService.Swagger;
+using GameStore.Common.Extensions;
+using GameStore.Common.Constants;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
 
+//builder.AddSqlDatabase("UserServiceConnection");
 builder.AddSqlDatabase();
 builder.AddGrpcClients();
 builder.AddAuthentication();
@@ -41,15 +42,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("Development", policy =>
-    {
-        policy.WithOrigins("http://localhost:4200")
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
+builder.AddCorsPolicy();
 
 var app = builder.Build();
 
@@ -58,11 +51,13 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    app.UseCors(CorsPolicies.Development);
 }
-
-app.UseCors("Development");
-
-DbPreparation.Population(app);
+else
+{
+    app.UseCors(CorsPolicies.Production);
+}
 
 app.UseHttpsRedirection();
 

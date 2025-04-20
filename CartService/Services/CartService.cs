@@ -111,7 +111,7 @@ public class CartService : ICartService
 
     private void ValidateProductId(int productId)
     {
-        if (productId == 0)
+        if (productId <= 0)
         {
             throw new ArgumentException("Invalid product id");
         }

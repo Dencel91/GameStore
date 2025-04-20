@@ -2,6 +2,9 @@ using CartService.DataServices;
 using CartService.DataServices.Grpc;
 using CartService.Extensions;
 using CartService.Services;
+using GameStore.Common.Constants;
+using GameStore.Common.Extensions;
+using GameStore.Common.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,22 +22,17 @@ builder.Services.AddSingleton<IMessageBusClient, MessageBusClient>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddCors(options =>
-{
-    // this defines a CORS policy called "default"
-    options.AddPolicy("Development", policy =>
-    {
-        policy.WithOrigins("http://localhost:4200")
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
+builder.AddCorsPolicy();
 
 var app = builder.Build();
 
@@ -43,13 +41,18 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors(CorsPolicies.Development);
 }
-
-app.UseCors("Development");
+else
+{
+    app.UseCors(CorsPolicies.Production);
+}
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseExceptionHandler();
 
 app.MapControllers();
 

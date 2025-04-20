@@ -3,11 +3,13 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-COPY *.csproj ./
-RUN dotnet restore
+COPY CartService/CartService.csproj CartService/
+COPY GameStore.Common/GameStore.Common.csproj GameStore.Common/
+RUN dotnet restore CartService/CartService.csproj
 
-COPY . ./
-RUN dotnet publish -c Realease -o out
+COPY CartService/ CartService/
+COPY /GameStore.Common/ GameStore.Common/
+RUN dotnet publish CartService/CartService.csproj -c Realease -o out
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app

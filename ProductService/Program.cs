@@ -1,3 +1,6 @@
+using GameStore.Common.Constants;
+using GameStore.Common.Extensions;
+using GameStore.Common.Infrastructure;
 using ProductService.Data;
 using ProductService.DataServices;
 using ProductService.DataServices.Grpc;
@@ -29,34 +32,33 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("Development", policy =>
-    {
-        policy.WithOrigins("http://localhost:4200")
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
+builder.AddCorsPolicy();
+
 
 var app = builder.Build();
-
-DbPreparation.Migration(app, app.Environment.IsDevelopment());
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors(CorsPolicies.Development);
 }
-
-app.UseCors("Development");
+else
+{
+    app.UseCors(CorsPolicies.Production);
+}
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseExceptionHandler();
 
 app.MapGrpcService<GrpcProductService>();
 

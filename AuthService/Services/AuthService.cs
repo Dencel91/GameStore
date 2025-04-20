@@ -181,15 +181,7 @@ public class AuthService(
             new Claim(ClaimTypes.Role, user.Role)
         };
 
-        string AuthenticationToken;
-        if (environment.IsDevelopment())
-        {
-            AuthenticationToken = configuration["Authentication:Token"] ?? throw new InvalidOperationException("Authentication token not found");
-        }
-        else
-        {
-            AuthenticationToken = Environment.GetEnvironmentVariable("AuthenticationToken") ?? throw new InvalidOperationException("Authentication token not found");
-        }
+        var AuthenticationToken = GetAuthenticationToken();
 
         var key = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(AuthenticationToken));
@@ -206,6 +198,18 @@ public class AuthService(
         var token = new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
 
         return token;
+    }
+
+    private string GetAuthenticationToken()
+    {
+        if (environment.IsDevelopment())
+        {
+            return configuration["Authentication:Token"]
+                ?? throw new InvalidOperationException("Authentication token not found");
+        }
+        
+        return Environment.GetEnvironmentVariable("AuthenticationToken")
+            ?? throw new InvalidOperationException("Authentication token not found");
     }
 
     public async Task<TokenResponse> RefreshTokens(RefreshTokenRequest request)

@@ -11,45 +11,22 @@ namespace AuthService.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<Guid>> Register([FromBody] RegisterRequest request)
         {
-            try
-            {
-                var userId = await authService.Register(request);
-                return Ok(userId);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var userId = await authService.Register(request);
+            return Ok(userId);
         }
 
         [HttpPost("login")]
         public async Task<ActionResult<TokenResponse>> Login([FromBody] LoginRequest requet)
         {
-            try
-            {
-                var result = await authService.Login(requet);
-
-                return Ok(result);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var result = await authService.Login(requet);
+            return Ok(result);
         }
 
         [HttpPost("google-login")]
         public async Task<ActionResult<TokenResponse>> GoogleLogin([FromBody] string credential)
         {
-            try
-            {
-                var result = await authService.GoogleLogin(credential);
-
-                return Ok(result);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var result = await authService.GoogleLogin(credential);
+            return Ok(result);
         }
 
         [HttpPost("refresh-token")]

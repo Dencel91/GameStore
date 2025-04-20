@@ -21,53 +21,30 @@ namespace CartService.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<CartDto>> Get(int id)
         {
-            try
-            {
-                var cart = await _cartService.GetCartById(id);
+            var cart = await _cartService.GetCartById(id);
 
-                if (cart == null)
-                {
-                    return NotFound();
-                }
-
-                return Ok(cart);
-            }
-            catch(ArgumentException e)
+            if (cart == null)
             {
-                return BadRequest(e.Message);
+                return NotFound();
             }
+
+            return Ok(cart);
         }
 
         [Authorize]
         [HttpGet]
         public async Task<ActionResult<CartDto?>> GetCurrentUserCart()
         {
-            try
-            {
-                var cart = await _cartService.GetCurrentUserCart();
-
-                return Ok(cart);
-            }
-            catch (ArgumentException e)
-            {
-                return BadRequest(e.Message);
-            }
+            var cart = await _cartService.GetCurrentUserCart();
+            return Ok(cart);
         }
 
         [HttpPost]
         [Route("add-product")]
         public async Task<ActionResult<CartDto>> AddProduct([FromBody]AddProductRequest addProductRequest)
         {
-            try
-            {
-                var cart = await _cartService.AddProduct(addProductRequest.CartId, addProductRequest.ProductId);
-
-                return Ok(cart);
-            }
-            catch (ArgumentException e)
-            {
-                return BadRequest(e.Message);
-            } 
+            var cart = await _cartService.AddProduct(addProductRequest.CartId, addProductRequest.ProductId);
+            return Ok(cart);
         }
 
         [HttpDelete]
@@ -75,7 +52,6 @@ namespace CartService.Controllers
         public async Task<ActionResult<CartDto>> RemoveProduct([FromBody] RemoveProductRequest addProductRequest)
         {
             var cart = await _cartService.RemoveProduct(addProductRequest.CartId, addProductRequest.ProductId);
-
             return Ok(cart);
         }
 
@@ -92,15 +68,8 @@ namespace CartService.Controllers
         [Route("payment/start")]
         public async Task<ActionResult> StartPayment([FromBody] int cartId)
         {
-            try
-            {
-                await _cartService.StartPayment(cartId);
-                return Ok();
-            }
-            catch (ArgumentException e)
-            {
-                return BadRequest(e.Message);
-            }
+            await _cartService.StartPayment(cartId);
+            return Ok();
         }
 
         [HttpPost]

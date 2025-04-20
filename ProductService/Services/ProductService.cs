@@ -52,7 +52,7 @@ public class ProductService : IProductService
     {
         if (id <= 0)
         {
-            throw new ArgumentException("Invalid product id", nameof(id));
+            throw new ArgumentException("Invalid product id");
         }
 
         return _productRepo.GetProduct(id);
@@ -116,12 +116,12 @@ public class ProductService : IProductService
 
         if (request.Price < 0)
         {
-            throw new ArgumentException("Price cannot be negative", nameof(request));
+            throw new ArgumentException("Price cannot be negative");
         }
 
         if (request.Images.Count() < 3)
         {
-            throw new ArgumentException("At least 3 preview images are required", nameof(request));
+            throw new ArgumentException("At least 3 preview images are required");
         }
     }
 
@@ -154,7 +154,7 @@ public class ProductService : IProductService
         try
         {
             var product = await _productRepo.GetProductDetails(request.ProductId)
-                ?? throw new ArgumentException("Product not found", nameof(request));
+                ?? throw new ArgumentException("Product not found");
 
             product.Name = request.Name;
             product.Description = request.Description;
@@ -220,18 +220,13 @@ public class ProductService : IProductService
 
         if (request.ProductId <= 0)
         {
-            throw new ArgumentException("Invalid product id", nameof(request));
+            throw new ArgumentException("Invalid product id");
         }
 
         if (request.Price < 0)
         {
-            throw new ArgumentException("Price cannot be negative", nameof(request));
+            throw new ArgumentException("Price cannot be negative");
         }
-
-        //if (request.Images.Count() < 3)
-        //{
-        //    throw new ArgumentException("At least 3 preview images are required", nameof(request));
-        //}
     }
 
     public Task<IEnumerable<Product>> GetProductsByIds(IEnumerable<int> ids)

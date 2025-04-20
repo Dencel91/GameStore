@@ -2,6 +2,9 @@ using AuthService.Data;
 using AuthService.DataServices;
 using AuthService.Extensions;
 using AuthService.Services;
+using GameStore.Common.Constants;
+using GameStore.Common.Extensions;
+using GameStore.Common.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,15 +19,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("Development", policy =>
-    {
-        policy.WithOrigins("http://localhost:4200")
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
+builder.AddCorsPolicy();
 
 var app = builder.Build();
 
@@ -32,13 +30,18 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors(CorsPolicies.Development);
 }
-
-app.UseCors("Development");
+else
+{
+    app.UseCors(CorsPolicies.Production);
+}
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseExceptionHandler();
 
 app.MapControllers();
 
