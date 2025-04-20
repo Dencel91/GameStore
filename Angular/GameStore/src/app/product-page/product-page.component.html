@@ -1,10 +1,14 @@
 <div class="container">
     <app-loading [loading]="isLoading" loadingClass="position-absolute top-50 start-50 translate-middle">
         @if(product){
-            <h1>{{product.name}}</h1>
-            @if (product.images && product.images.length > 0) {
-                <div class="row">
-                    <div class="col">
+            <div class="row justify-content-center text-center text-lg-start">
+                <div class="col-xl-10 order-first">
+                    <h1>{{product.name}}</h1>
+                </div>
+                
+                <div class="col-12 col-md-10 col-lg-8 col-xl-6 order-2 order-lg-1 mb-3">
+                    @if (product.images && product.images.length > 0) {
+                        
                         <ngb-carousel style="max-width: 600px;">
                             @for(imageUrl of product.images; track imageUrl){
                                 <ng-template ngbSlide>
@@ -14,25 +18,35 @@
                                 </ng-template>
                             }
                         </ngb-carousel>
-                    </div>
-                    <div class="col-4">
-                        <img class="img-thumbnail" src={{product.thumbnailUrl}} />
-                        <p>{{product.description}}</p>
-                        <p>Reviews: Good</p>
-                        <p>Releace date: 20.10.2016</p>
-                    </div>
+                    }
                 </div>
-            }
+                
+                <div class="col-12 col-md-8 col-lg-4 order-1 order-lg-2 mb-3">
+                    <ul class="list-group">
+                        <img class="img-fluid rounded-top" src={{product.thumbnailUrl}} />
+                        <li class="list-group-item">{{product.description}}</li>
+                        <li class="list-group-item">
+                            Reviews: <span class="good-review">Good</span>
+                        </li>
+                        <li class="list-group-item">Release date: 20.10.2016</li>
+                    </ul>
+                </div>
 
-            @if(!this.authService.isAuthenticated() || !this.userProductInfo?.owned){
-                @if(product.price > 0) {
-                    {{product.price | currency}} <button type="button" class="btn btn-primary" (click)="addToCart(product.id)">Add to Cart</button>
-                } @else {
-                    <button type="button" class="btn btn-primary" (click)="addToLibrary(product.id)">Add to Library</button>
-                }  
-            } @else {
-                <h2>Already in your library!</h2>
-            }
+                <div class="col-xl-10 order-last mb-3 d-flex justify-content-center justify-content-lg-start">
+                    @if(!this.authService.isAuthenticated() || !this.userProductInfo?.owned){
+                        @if(product.price > 0) {
+                            <ul class="list-group list-group-horizontal w-lg-100">
+                                <li class="list-group-item">{{product.price | currency}}</li>
+                                <button type="button" class="btn btn-primary rounded-start-0 w-lg-100" (click)="addToCart(product.id)">Add to Cart</button>
+                            </ul>
+                        } @else {
+                            <button type="button" class="btn btn-primary w-lg-100" (click)="addToLibrary(product.id)">Add to Library</button>
+                        }
+                    } @else {
+                        <h2>Already in your library!</h2>
+                    }
+                </div>
+            </div>
 
             <!-- <h3>Reviews:</h3>
 
