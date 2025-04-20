@@ -29,7 +29,21 @@ export class AuthInterceptor implements HttpInterceptor {
   private handleAuthError(req: HttpRequest<any>, next: HttpHandler, error: HttpErrorResponse): Observable<HttpEvent<any>> {
     if (error.status === 401) {
       if (!this.authService.getRefreshToken()) {
-        this.router.navigate(["/login"]);
+        if (!req.headers.has('No-Redirect')) {
+          this.router.navigate(["/login"]);
+        }
+        
+        return throwError(() => error);
+      }
+
+      if (req.url.endsWith('refresh-token')) {
+        this.authService.logout();
+
+        if (!req.headers.has('No-Redirect')) {
+          this.router.navigate(["/login"]);
+        }
+        
+        return throwError(() => error);
       }
 
       return this.authService.refreshToken().pipe(
@@ -38,20 +52,13 @@ export class AuthInterceptor implements HttpInterceptor {
             headers: req.headers.set("Authorization", `Bearer ${response.accessToken}`)
           });
           return next.handle(cloned);
-        }),
-        catchError((refreshError) => {
-          if (refreshError.status === 401) {
-            this.authService.logout();
-            this.router.navigate(["/login"]);
-          }
-          return throwError(() => refreshError);
-        })
-      );
+        }));
     } else if (error.status === 403) {
       console.error("Forbidden request", error);
     } else {
       console.error("An error occurred", error);
     }
+
     return throwError(() => error);
   }
 }

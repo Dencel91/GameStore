@@ -10,7 +10,7 @@
           <li class="nav-item">
             <a class="nav-link" aria-current="page" routerLinkActive="active"  routerLink="/store">Store</a>
           </li>
-          @if(this.authService.isLoggedIn) {
+          @if(this.authService.isAuthenticated()) {
             @if(this.authService.isAdmin()) {
               <li class="nav-item">
                 <button class="nav-link" (click)="showAdminPanel()">Admin</button>

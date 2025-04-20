@@ -14,8 +14,6 @@ export class AuthService {
 
   url = environment.authUrl;
 
-  isLoggedIn = this.getRefreshToken() !== '';
-
   get token(): string {
     return localStorage.getItem('token') ?? '';
   }
@@ -43,18 +41,15 @@ export class AuthService {
       localStorage.setItem('userId', decodedToken[UserIdClaim]);
       localStorage.setItem('userName', decodedToken[NameClaim]);
     }
-
-    this.isLoggedIn = true;
   }
 
   removeAuthInfo() {
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
-    this.isLoggedIn = false;
   }
 
   isAuthenticated(): boolean {
-    return this.isLoggedIn;
+    return this.getRefreshToken() !== '';
   }
 
   private loginSubject = new BehaviorSubject<boolean>(false);
@@ -132,6 +127,10 @@ export class AuthService {
 
   private getDecodedToken(): CustomJwtPayload | null {
     try {
+      if (!this.token) {
+        return null;
+      }
+      
       return jwtDecode<CustomJwtPayload>(this.token);
     } catch (error) {
       console.error('Invalid token', error);

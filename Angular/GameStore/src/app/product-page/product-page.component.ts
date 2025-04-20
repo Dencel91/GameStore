@@ -44,9 +44,15 @@ export class ProductPageComponent {
         this.product = data;
 
         if (this.authService.isAuthenticated()) {
-          this.userService.getUserProductInfo(id).subscribe((response: any) => {
+          this.userService.getUserProductInfo(id).subscribe({
+            next: (response: any) => {
             this.userProductInfo = response;
             this.isLoading = false;
+            },
+            error: (error: any) => {
+              console.error(error);
+              this.isLoading = false;
+            }
           });
         }
         else {
