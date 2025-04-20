@@ -38,6 +38,7 @@ export class LoginPageComponent {
   initializeGoogleSignIn() {
     google.accounts.id.initialize({
       client_id: this.googleClientId,
+      
       callback: this.handleCredentialResponse.bind(this),
     });
 
@@ -47,12 +48,10 @@ export class LoginPageComponent {
   }
 
   triggerGoogleSignIn() {
-    google.accounts.id.prompt((notification: any) => {
-      google.accounts.id.renderButton(
-        document.getElementById("googleSignIn") as HTMLElement,
-        { theme: "filled_black", text: "continue_with", size: "large", width: "400px" }
-      );
-    });
+    google.accounts.id.renderButton(
+      document.getElementById("googleSignIn") as HTMLElement,
+      { theme: "filled_black", text: "continue_with", size: "large", width: "400px" }
+    );
   }
 
   handleCredentialResponse(response: CredentialResponse) {
