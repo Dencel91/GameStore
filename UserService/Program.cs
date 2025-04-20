@@ -1,23 +1,25 @@
+using GameStore.Common.Constants;
+using GameStore.Common.Extensions;
+using GameStore.Common.Infrastructure;
 using Microsoft.Extensions.Options;
+using ProductService;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using UserService.Data;
 using UserService.DataServices.Grpc;
 using UserService.DataServices.MessageBus;
 using UserService.DataServices.MessageBus.EventProcessing;
 using UserService.Extensions;
-using GameStore.Common.Infrastructure;
 using UserService.Services;
 using UserService.Swagger;
-using GameStore.Common.Extensions;
-using GameStore.Common.Constants;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-//builder.AddSqlDatabase("UserServiceConnection");
+builder.AddLogging();
 builder.AddSqlDatabase();
-builder.AddGrpcClients();
+builder.AddGrpcClient<GrpcProduct.GrpcProductClient>("GrpcConfigs:ProductServiceUrl");
 builder.AddAuthentication();
 
 builder.Environment.IsDevelopment();

@@ -1,4 +1,5 @@
 ﻿using AuthService.Events;
+using GameStore.Common.Helpers;
 using RabbitMQ.Client;
 using System.Text;
 using System.Text.Json;
@@ -22,39 +23,16 @@ public class MessageBusClient : IMessageBusClient
 
     private async Task SetConnection(IConfiguration configuration, IWebHostEnvironment environment)
     {
-        RabbitMQSettings settings;
-
-        if (environment.IsDevelopment())
-        {
-            settings = new RabbitMQSettings()
-            {
-                HostName = configuration["RabbitMQ:HostName"],
-                Port = int.Parse(configuration["RabbitMQ:Port"]),
-                UserName = configuration["RabbitMQ:Username"],
-                Password = configuration["RabbitMQ:Password"]
-            };
-        }
-        else
-        {
-            settings = new RabbitMQSettings()
-            {
-                HostName = configuration["RabbitMQ:HostName"],
-                Port = int.Parse(configuration["RabbitMQ:Port"]),
-                UserName = Environment.GetEnvironmentVariable("RabbitMqUserName"),
-                Password = Environment.GetEnvironmentVariable("RabbitMqPassword")
-            };
-        }
-
-        var factory = new ConnectionFactory()
-        {
-            HostName = settings.HostName,
-            Port = settings.Port,
-            UserName = settings.UserName,
-            Password = settings.Password
-        };
-
         try
         {
+            var factory = new ConnectionFactory()
+            {
+                HostName = configuration["RabbitMQ:HostName"] ?? throw new InvalidOperationException("Config error: RabbitMQ:HostName is not set "),
+                Port = int.Parse(configuration["RabbitMQ:Port"] ?? throw new InvalidOperationException("Config error: RabbitMQ:Port is not set ")),
+                UserName = ConfigHelper.GetSecret(environment, configuration, "RabbitMq-UserName"),
+                Password = ConfigHelper.GetSecret(environment, configuration, "RabbitMq-Password")
+            };
+
             _connection = await factory.CreateConnectionAsync();
             _channel = await _connection.CreateChannelAsync();
             await _channel.ExchangeDeclareAsync(UserRegisteredExchangeName, ExchangeType.Fanout);
@@ -63,6 +41,7 @@ public class MessageBusClient : IMessageBusClient
         catch (Exception ex)
         {
             _logger.LogError("Cannot connect to RabbitMQ: {message}", ex.Message);
+            throw;
         }
     }
 

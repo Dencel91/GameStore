@@ -1,18 +1,25 @@
+using CartService.Data;
 using CartService.DataServices;
 using CartService.DataServices.Grpc;
-using CartService.Extensions;
 using CartService.Services;
 using GameStore.Common.Constants;
 using GameStore.Common.Extensions;
 using GameStore.Common.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using ProductService;
+using UserService;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.AddSqlDatabase();
-builder.AddGrpcClients();
 builder.AddLogging();
 builder.AddAuthentication();
+
+builder.AddGrpcClient<GrpcProduct.GrpcProductClient>("GrpcConfigs:ProductServiceUrl");
+builder.AddGrpcClient<GrpcUser.GrpcUserClient>("GrpcConfigs:UserServiceUrl");
+
+builder.Services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("InMem"));
+
+builder.Services.AddScoped<ICartRepo, CartRepo>();
 
 builder.Services.AddScoped<ICartService, CartService.Services.CartService>();
 builder.Services.AddScoped<IProductDataClient, ProductDataClient>();

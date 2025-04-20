@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using GameStore.Common.Helpers;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 using UserService.DataServices.MessageBus.EventProcessing;
@@ -32,54 +33,34 @@ public class MessageBusSubscriber : BackgroundService
 
     private async Task InitializeMessageBus(IConfiguration configuration, IWebHostEnvironment environment)
     {
-        RabbitMQSettings settings;
-
-        if (environment.IsDevelopment())
-        {
-            settings = new RabbitMQSettings()
-            {
-                HostName = configuration["RabbitMQ:HostName"],
-                Port = int.Parse(configuration["RabbitMQ:Port"]),
-                UserName = configuration["RabbitMQ:Username"],
-                Password = configuration["RabbitMQ:Password"]
-            };
-        }
-        else
-        {
-            settings = new RabbitMQSettings()
-            {
-                HostName = configuration["RabbitMQ:HostName"],
-                Port = int.Parse(configuration["RabbitMQ:Port"]),
-                UserName = Environment.GetEnvironmentVariable("RabbitMqUserName"),
-                Password = Environment.GetEnvironmentVariable("RabbitMqPassword")
-            };
-        }
-
-        var factory = new ConnectionFactory()
-        {
-            HostName = settings.HostName,
-            Port = settings.Port,
-            UserName = settings.UserName,
-            Password = settings.Password
-        };
-
         try
         {
+            var factory = new ConnectionFactory()
+            {
+                HostName = configuration["RabbitMQ:HostName"] ?? throw new InvalidOperationException("Config error: RabbitMQ:HostName is not set "),
+                Port = int.Parse(configuration["RabbitMQ:Port"] ?? throw new InvalidOperationException("Config error: RabbitMQ:Port is not set ")),
+                UserName = ConfigHelper.GetSecret(environment, configuration, "RabbitMq-UserName"),
+                Password = ConfigHelper.GetSecret(environment, configuration, "RabbitMq-Password")
+            };
+
             _connection = await factory.CreateConnectionAsync();
             _channel = await _connection.CreateChannelAsync();
 
-            await _channel.ExchangeDeclareAsync(UserRegisteredExchangeName, ExchangeType.Fanout);
-            await _channel.QueueDeclareAsync(exclusive: false, queue: UserRegisteredQueueName, durable: true, autoDelete: false);
-            await _channel.QueueBindAsync(UserRegisteredQueueName, UserRegisteredExchangeName, "");
-
-            await _channel.ExchangeDeclareAsync(PurchaseCompletedExchangeName, ExchangeType.Fanout);
-            await _channel.QueueDeclareAsync(exclusive: false, queue: PurchaseCompletedQueueName, durable: true, autoDelete: false);
-            await _channel.QueueBindAsync(PurchaseCompletedQueueName, PurchaseCompletedExchangeName, "");
+            await BindQueue(UserRegisteredExchangeName, UserRegisteredQueueName);
+            await BindQueue(PurchaseCompletedExchangeName, PurchaseCompletedQueueName);
         }
         catch (Exception ex)
         {
             _logger.LogError("Cannot connect to Message Bus: {message}", ex.Message);
+            throw;
         }
+    }
+
+    private async Task BindQueue(string exchangeName, string queueName)
+    {
+        await _channel.ExchangeDeclareAsync(exchangeName, ExchangeType.Fanout);
+        await _channel.QueueDeclareAsync(exclusive: false, queue: queueName, durable: true, autoDelete: false);
+        await _channel.QueueBindAsync(queueName, exchangeName, "");
     }
 
     public void Dispose()

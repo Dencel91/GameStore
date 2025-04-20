@@ -1,9 +1,12 @@
 ﻿using GameStore.Common.Constants;
+using GameStore.Common.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace GameStore.Common.Extensions;
@@ -12,10 +15,7 @@ public static class WebApplicationBuilderExtensions
 {
     public static void AddAuthentication(this WebApplicationBuilder builder)
     {
-        string signingKey = (builder.Environment.IsDevelopment()
-            ? builder.Configuration["Authentication:Key"]
-            : Environment.GetEnvironmentVariable("AuthenticationKey"))
-            ?? throw new InvalidOperationException("No authentication key");
+        string signingKey = ConfigHelper.GetSecret(builder.Environment, builder.Configuration, "Authentication-Key");
 
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(
             options =>
@@ -60,5 +60,31 @@ public static class WebApplicationBuilderExtensions
                 });
             });
         }
+    }
+
+    public static void AddLogging(this WebApplicationBuilder builder)
+    {
+        builder.Logging.ClearProviders();
+        builder.Logging.AddConsole();
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            builder.Logging.AddEventLog(settings => settings.SourceName = builder.Configuration["ProjectName"]);
+        }
+    }
+
+    public static void AddGrpcClient<T>(this WebApplicationBuilder builder, string urlConfigName) where T : class
+    {
+        var serviceAddress = builder.Configuration[urlConfigName];
+
+        if (string.IsNullOrEmpty(serviceAddress))
+        {
+            throw new InvalidOperationException($"Grpc congif error: serviceUrl at {urlConfigName} is empty");
+        }
+
+        builder.Services.AddGrpcClient<T>(o =>
+        {
+            o.Address = new Uri(serviceAddress);
+        });
     }
 }

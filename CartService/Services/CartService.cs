@@ -1,11 +1,11 @@
-﻿using CartService.Data;
+﻿using AutoMapper;
+using CartService.Data;
 using CartService.DataServices;
+using CartService.DataServices.Grpc;
+using CartService.DTOs;
 using CartService.Events;
 using CartService.Models;
-using CartService.DataServices.Grpc;
-using System.Security.Claims;
-using AutoMapper;
-using CartService.DTOs;
+using GameStore.Common.Helpers;
 
 namespace CartService.Services;
 
@@ -84,7 +84,7 @@ public class CartService : ICartService
 
         if (cart.UserId == Guid.Empty)
         {
-            var userId = GetCurrentUserId();
+            var userId = AuthHelper.GetCurrentUserIdOrDefault(_httpContextAccessor);
             if (userId != Guid.Empty)
             {
                 cart.UserId = userId;
@@ -177,7 +177,7 @@ public class CartService : ICartService
 
         var cart = await _cartRepo.GetCartById(cartId) ?? throw new ArgumentException("Cart not found");
 
-        var userId = GetCurrentUserId();
+        var userId = AuthHelper.GetCurrentUserId(_httpContextAccessor);
         var userCart = await _cartRepo.GetCartByUserId(userId);
 
         if (userCart is null)
@@ -207,7 +207,7 @@ public class CartService : ICartService
 
     public async Task<CartDto?> GetCurrentUserCart()
     {
-        var userId = GetCurrentUserId();
+        var userId = AuthHelper.GetCurrentUserIdOrDefault(_httpContextAccessor);
 
         if (userId == Guid.Empty)
         {
@@ -230,31 +230,12 @@ public class CartService : ICartService
 
         if (cart.UserId == Guid.Empty)
         {
-            var currentUserId = GetCurrentUserId();
-
-            if (currentUserId == Guid.Empty)
-            {
-                throw new ArgumentException("User not found");
-            }
-
-            cart.UserId = currentUserId;
+            cart.UserId = AuthHelper.GetCurrentUserId(_httpContextAccessor);
         }
 
         ValidateUserProducts(cart.UserId, cart.Products.Select(p => p.ProductId));
 
         await _cartRepo.SaveChanges();
-    }
-
-    private Guid GetCurrentUserId()
-    {
-        if (_httpContextAccessor.HttpContext is null)
-        {
-            return Guid.Empty;
-        }
-
-        var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        return string.IsNullOrEmpty(userId) ? Guid.Empty : Guid.Parse(userId);
     }
 
     public async Task CompletePayment(int cartId)

@@ -3,6 +3,7 @@ using AuthService.DataServices;
 using AuthService.DTOs;
 using AuthService.Events;
 using AuthService.Models;
+using GameStore.Common.Helpers;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -18,7 +19,7 @@ public class AuthService(
     IUserRepo userRepo,
     IConfiguration configuration,
     IMessageBusClient messageBusClient,
-    IHostEnvironment environment) : IAuthService
+    IWebHostEnvironment environment) : IAuthService
 {
     public async Task<Guid> Register(RegisterRequest request)
     {
@@ -181,7 +182,7 @@ public class AuthService(
             new Claim(ClaimTypes.Role, user.Role)
         };
 
-        var AuthenticationToken = GetAuthenticationToken();
+        var AuthenticationToken = ConfigHelper.GetSecret(environment, configuration, "Authentication-Token");
 
         var key = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(AuthenticationToken));
@@ -198,18 +199,6 @@ public class AuthService(
         var token = new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
 
         return token;
-    }
-
-    private string GetAuthenticationToken()
-    {
-        if (environment.IsDevelopment())
-        {
-            return configuration["Authentication:Token"]
-                ?? throw new InvalidOperationException("Authentication token not found");
-        }
-        
-        return Environment.GetEnvironmentVariable("AuthenticationToken")
-            ?? throw new InvalidOperationException("Authentication token not found");
     }
 
     public async Task<TokenResponse> RefreshTokens(RefreshTokenRequest request)

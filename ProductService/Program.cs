@@ -10,6 +10,7 @@ using ProductService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddLogging();
 builder.AddSqlDatabase();
 builder.AddAuthentication();
 
@@ -24,7 +25,6 @@ builder.Services.AddScoped<IFileService, AzureFileService>();
 builder.Services.AddGrpc();
 
 builder.Services.AddSingleton<IEventProcessor, EventProcessor>();
-builder.Services.AddHostedService<MessageBusSubscriber>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

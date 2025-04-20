@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+﻿using GameStore.Common.Helpers;
 using UserService.Data;
 using UserService.DataServices.Grpc;
 using UserService.Dtos;
@@ -21,27 +21,12 @@ namespace UserService.Services
 
         public async Task<User> GetCurrentUser()
         {
-            var userId = GetCurrentUserId();
+            var userId = AuthHelper.GetCurrentUserId(_httpContextAccessor);
 
             var user = await _userRepo.GetUserById(userId)
                 ?? throw new InvalidOperationException($"Current user not found: {userId}");
 
             return user;
-        }
-
-        private Guid GetCurrentUserId()
-        {
-            if (_httpContextAccessor.HttpContext is null)
-            {
-                throw new InvalidOperationException("No HttpContext");
-            }
-
-            //var userId = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
-
-            string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)
-                ?? throw new InvalidOperationException("No Identifier found in claims");
-
-            return Guid.Parse(userId);
         }
 
         public async Task<User?> GetUserById(Guid id)
@@ -67,7 +52,7 @@ namespace UserService.Services
 
         public Task<IEnumerable<ProductDto>> GetCurrentUserProducts()
         {
-            var userId = GetCurrentUserId();
+            var userId = AuthHelper.GetCurrentUserId(_httpContextAccessor);
             return GetUserProducts(userId);
         }
 
@@ -90,7 +75,7 @@ namespace UserService.Services
         {
             var response = new GetUserProductInfoResponse();
 
-            var userId = GetCurrentUserId();
+            var userId = AuthHelper.GetCurrentUserId(_httpContextAccessor);
 
             var products = await _userRepo.GetUserProducts(userId);
 
@@ -101,7 +86,7 @@ namespace UserService.Services
 
         public async Task AddFreeProductToUser(int productId)
         {
-            var userId = GetCurrentUserId();
+            var userId = AuthHelper.GetCurrentUserId(_httpContextAccessor);
 
             await ValidateAddFreeProductToUserRequest(userId, productId);
 

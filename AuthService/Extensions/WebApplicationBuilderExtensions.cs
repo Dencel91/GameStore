@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using AuthService.Data;
+using GameStore.Common.Helpers;
 
 namespace AuthService.Extensions;
 
@@ -8,17 +9,9 @@ public static class WebApplicationBuilderExtensions
     private const string AuthServiceConnectioName = "AuthServiceConnection";
     public static void AddSqlDatabase(this WebApplicationBuilder builder)
     {
-        var productServiceConnection = "";
+        var serviceConnection =
+            ConfigHelper.GetSecret(builder.Environment, builder.Configuration, AuthServiceConnectioName);
 
-        if (builder.Environment.IsDevelopment())
-        {
-            productServiceConnection = builder.Configuration.GetConnectionString(AuthServiceConnectioName);
-        }
-        else
-        {
-            productServiceConnection = Environment.GetEnvironmentVariable(AuthServiceConnectioName);
-        }
-
-        builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(productServiceConnection));
+        builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(serviceConnection));
     }
 }

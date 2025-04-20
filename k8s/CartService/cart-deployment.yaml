@@ -22,17 +22,17 @@ spec:
             memory: "512Mi"
             cpu: "500m"
         env:
-        - name: RabbitMqUserName
+        - name: RabbitMq-UserName
           valueFrom:
             secretKeyRef:
               name: rabbitmq-secret
               key: username
-        - name: RabbitMqPassword
+        - name: RabbitMq-Password
           valueFrom:
             secretKeyRef:
               name: rabbitmq-secret
               key: password
-        - name: AuthenticationKey
+        - name: Authentication-Key
           valueFrom:
             secretKeyRef:
               name: authentication-key

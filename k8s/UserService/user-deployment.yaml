@@ -27,17 +27,17 @@ spec:
             secretKeyRef:
               name: user-service-connection
               key: ConnectionString
-        - name: AuthenticationKey
+        - name: Authentication-Key
           valueFrom:
             secretKeyRef:
               name: authentication-key
               key: signing-key
-        - name: RabbitMqUserName
+        - name: RabbitMq-UserName
           valueFrom:
             secretKeyRef:
               name: rabbitmq-secret
               key: username
-        - name: RabbitMqPassword
+        - name: RabbitMq-Password
           valueFrom:
             secretKeyRef:
               name: rabbitmq-secret

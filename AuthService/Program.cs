@@ -8,7 +8,9 @@ using GameStore.Common.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddLogging();
 builder.AddSqlDatabase();
+
 builder.Services.AddScoped<IUserRepo, UserRepo>();
 
 builder.Services.AddScoped<IAuthService, AuthService.Services.AuthService>();
