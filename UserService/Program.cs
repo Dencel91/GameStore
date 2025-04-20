@@ -5,6 +5,7 @@ using UserService.DataServices.Grpc;
 using UserService.DataServices.MessageBus;
 using UserService.DataServices.MessageBus.EventProcessing;
 using UserService.Extensions;
+using UserService.Infrastructure;
 using UserService.Services;
 using UserService.Swagger;
 
@@ -37,6 +38,9 @@ builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwa
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Development", policy =>
@@ -63,6 +67,8 @@ DbPreparation.Population(app);
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseExceptionHandler();
 
 app.MapControllers();
 

@@ -110,6 +110,11 @@ namespace UserService.Services
 
         private async Task ValidateAddFreeProductToUserRequest(Guid userId, int productId)
         {
+            if (productId <= 0)
+            {
+                throw new ArgumentException("Invalid product id");
+            }
+
             var product = _productClient.GetProductById(productId);
 
             if (product?.Price > 0)
