@@ -41,6 +41,14 @@ public class UsersController : Controller
         return Ok(productInfo);
     }
 
+    [Authorize]
+    [HttpPost("products")]
+    public async Task<ActionResult> AddFreeProductToUser([FromBody] int productId)
+    {
+        await _userService.AddFreeProductToUser(productId);
+        return Ok();
+    }
+
     [HttpGet("{id}", Name = "GetUserById")]
     public async Task<ActionResult<User>> GetUserById(Guid id)
     {

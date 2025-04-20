@@ -18,4 +18,6 @@ public interface IUserService
     Task AddProductsToUser(Guid userId, IEnumerable<int> productIds);
 
     Task<GetUserProductInfoResponse> GetUserProductInfo(int productId);
+
+    Task AddFreeProductToUser(int productId);
 }

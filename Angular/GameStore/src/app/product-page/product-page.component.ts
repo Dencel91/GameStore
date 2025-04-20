@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../services/product.service';
 import { Product } from '../interfaces/product';
 import { CartService } from '../services/cart.service';
@@ -26,6 +26,7 @@ export class ProductPageComponent {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private productService: ProductService,
     private cartService: CartService,
     public authService: AuthService,
@@ -89,8 +90,10 @@ export class ProductPageComponent {
     });
   }
 
-  addToLibrary() {
-
+  addToLibrary(productId: number) {
+      this.userService.addFreeProductToUser(productId).subscribe(() => {
+        this.router.navigate(['/library']);
+      });
   }
 
   showCartModal(title: string, cart: Cart) {

@@ -40,10 +40,14 @@ export class UserService {
     return this.httpClient.get<Product[]>(this.url + '/products');
   }
 
-  getUserProductInfo(productId: number) : Observable<any> {
+  getUserProductInfo(productId: number): Observable<any> {
     const headers = new HttpHeaders({ 'No-Redirect': 'true' });
 
     const options = {headers};
     return this.httpClient.get(this.url + '/products/' + productId, options);
+  }
+
+  addFreeProductToUser(productId: number): Observable<any> {
+    return this.httpClient.post(this.url + '/products', productId);
   }
 }

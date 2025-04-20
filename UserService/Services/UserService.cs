@@ -98,5 +98,31 @@ namespace UserService.Services
 
             return response;
         }
+
+        public async Task AddFreeProductToUser(int productId)
+        {
+            var userId = GetCurrentUserId();
+
+            await ValidateAddFreeProductToUserRequest(userId, productId);
+
+            await AddProductsToUser(userId, [productId]);
+        }
+
+        private async Task ValidateAddFreeProductToUserRequest(Guid userId, int productId)
+        {
+            var product = _productClient.GetProductById(productId);
+
+            if (product?.Price > 0)
+            {
+                throw new ArgumentException("Product is not free");
+            }
+
+            var products = await GetUserProducts(userId);
+
+            if (products.Any(p => p.Id == productId))
+            {
+                throw new ArgumentException("The user already has this product");
+            }
+        }
     }
 }

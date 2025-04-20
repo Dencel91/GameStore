@@ -72,7 +72,7 @@ namespace CartService.Controllers
 
         [HttpDelete]
         [Route("remove-product")]
-        public async Task<ActionResult<CartDto>> RemoveProduct([FromBody] AddProductRequest addProductRequest)
+        public async Task<ActionResult<CartDto>> RemoveProduct([FromBody] RemoveProductRequest addProductRequest)
         {
             var cart = await _cartService.RemoveProduct(addProductRequest.CartId, addProductRequest.ProductId);
 
