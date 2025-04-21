@@ -2,20 +2,31 @@
     @if(cart && cart.products.length > 0) {
         <div class="container">
             <br>
-            <div class="row justify-content-between">
-                <div class="col-xxl-7 col-xl-8 col-lg-7 col-md-8 col-sm-8">
+            <div class="row justify-content-center">
+                <div class="col-10 col-md-10 col-lg-7">
                     @for(product of cart.products; track product.id){
                         <div class="row">
                             <app-cart-item [product]="product" (cartUpdated)="handleCartUpdated($event)"></app-cart-item>
                         </div>
                     }
                 </div>
-                <div class="col-xl-3 col-lg-3 col-md-4 col-sm-4">
+                <div class="col-10 col-md-10 col-lg-3">
                     <div class="card">
-                        <div class="card-body">
-                            <h5>Total ${{cart.totalPrice}}</h5>
-                            <button type="button" [disabled]="cart.products.length == 0" class="btn btn-primary" (click)="startPayment()">Continue to payment</button>
-                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <div>Subtotal</div>
+                                <app-price [price]="cart.totalPrice"/>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <div>VAT</div>
+                                <div>{{0 | currency}}</div>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <div>Total</div>
+                                <app-price [price]="cart.totalPrice"/>
+                            </li>
+                        </ul>
+                        <button type="button" [disabled]="cart.products.length == 0" class="btn btn-primary w-100 rounded-top-0" (click)="startPayment()">Continue to payment</button>
                     </div>
                 </div>
             </div>
