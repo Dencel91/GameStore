@@ -12,6 +12,10 @@ export class UserService {
 
   constructor(private httpClient: HttpClient, private authService: AuthService) { 
     this.authService.loginEvent$.subscribe(isLoggedIn => {
+      if (isLoggedIn === null) {
+        return;
+      }
+
       if (isLoggedIn) {
         this.getUserInfo();
       } else {

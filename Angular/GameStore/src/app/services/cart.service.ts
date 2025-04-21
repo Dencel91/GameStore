@@ -12,6 +12,10 @@ export class CartService {
 
   constructor(private http: HttpClient, private authService: AuthService) {
     this.authService.loginEvent$.subscribe(isLoggedIn => {
+      if (isLoggedIn === null) {
+        return;
+      }
+      
       if (isLoggedIn) {
         if (this.cartId) {
           this.mergeCarts().subscribe(cart => {

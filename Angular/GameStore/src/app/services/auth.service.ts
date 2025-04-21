@@ -52,7 +52,7 @@ export class AuthService {
     return this.getRefreshToken() !== '';
   }
 
-  private loginSubject = new BehaviorSubject<boolean>(false);
+  private loginSubject = new BehaviorSubject<boolean | null>(null);
   public loginEvent$ = this.loginSubject.asObservable();
 
   login(username: string, password: string): Observable<any> {
@@ -111,13 +111,7 @@ export class AuthService {
   }
 
   isAdmin(): boolean {
-    let test = this.getUserRole();
     return this.getUserRole() === 'Admin';
-  }
-
-  private getUserName(): string {
-    const decodedToken = this.getDecodedToken();
-    return decodedToken ? decodedToken[NameClaim] : '';
   }
 
   private getUserRole(): string {
