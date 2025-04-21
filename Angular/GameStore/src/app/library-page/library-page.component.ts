@@ -3,10 +3,11 @@ import { UserService } from '../services/user.service';
 import { Product } from '../interfaces/product';
 import { RouterLink } from '@angular/router';
 import { LoadingComponent } from "../loading/loading.component";
+import { NoContentMessageComponent } from "../no-content-message/no-content-message.component";
 
 @Component({
   selector: 'app-library-page',
-  imports: [RouterLink, LoadingComponent],
+  imports: [RouterLink, LoadingComponent, NoContentMessageComponent],
   templateUrl: './library-page.component.html',
   styleUrl: './library-page.component.css'
 })

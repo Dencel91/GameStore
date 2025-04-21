@@ -4,10 +4,11 @@ import { Cart } from '../interfaces/cart';
 import { CartItemComponent } from "../cart-item/cart-item.component";
 import { Router } from '@angular/router';
 import { LoadingComponent } from "../loading/loading.component";
+import { NoContentMessageComponent } from '../no-content-message/no-content-message.component';
 
 @Component({
   selector: 'app-cart-page',
-  imports: [CartItemComponent, LoadingComponent],
+  imports: [CartItemComponent, LoadingComponent, NoContentMessageComponent],
   templateUrl: './cart-page.component.html',
   styleUrl: './cart-page.component.css'
 })

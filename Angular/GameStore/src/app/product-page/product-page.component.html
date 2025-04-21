@@ -47,19 +47,9 @@
                     }
                 </div>
             </div>
-
-            <!-- <h3>Reviews:</h3>
-
-            @for(review of product.reviews; track review)
-            {
-                <p>{{review.userName}}</p>
-                <p>{{review.date}}</p>
-                <p>{{review.isRecommended}}</p>
-                <p>{{review.reviewText}}</p>
-            } -->
         }
         @else {
-            <h1 class="position-absolute top-50 start-50 translate-middle">Product not found</h1>
+            <app-no-content-message>Product not found</app-no-content-message>
         }
     </app-loading>
 </div>

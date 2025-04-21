@@ -2,10 +2,11 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Product } from '../interfaces/product';
 import { CartService } from '../services/cart.service';
 import { Cart } from '../interfaces/cart';
+import { PriceComponent } from "../price/price.component";
 
 @Component({
   selector: 'app-cart-item',
-  imports: [],
+  imports: [PriceComponent],
   templateUrl: './cart-item.component.html',
   styleUrl: './cart-item.component.css'
 })

@@ -10,4 +10,10 @@ import { Component, Input } from '@angular/core';
 export class LoadingComponent {
   @Input() loading: boolean = false;
   @Input() loadingClass: string = '';
+
+  ngOnInit() {
+    if (!this.loadingClass) {
+      this.loadingClass = 'position-absolute top-50 start-50 translate-middle';
+    }
+  }
 }

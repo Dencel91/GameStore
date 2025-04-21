@@ -1,5 +1,5 @@
 <div class="container-fluid">
-    <app-loading [loading]="loading" loadingClass="position-absolute top-50 start-50 translate-middle">
+    <app-loading [loading]="loading">
         @if(products.length > 0) {
             <div class="row">
                 <div class="col-2">
@@ -23,7 +23,7 @@
             </div>            
         }
         @else {
-            <h1 class="position-absolute top-50 start-50 translate-middle">Your library is empty.</h1>
+            <app-no-content-message>Your library is empty.</app-no-content-message>
         }
     </app-loading>
 </div>

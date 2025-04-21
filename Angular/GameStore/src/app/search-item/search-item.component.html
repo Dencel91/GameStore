@@ -1,15 +1,18 @@
 @if(product) {
-    <a routerLink="/product/{{product.id}}">
-        <div class="card mb-3 mt-3">
-            <div class="row g-0">
-                <div class="col-lg-6 col-md-6  max-vw-100">
-                    <img src="{{product.thumbnailUrl}}" class="img-fluid rounded-start" alt="...">
-                </div>
-                <div class="col-lg-6 col-md-6">
-                    <div class="card-body">
+    <div class="card mb-3 mt-3">
+        <div class="row g-0">
+            <div class="col-md-6 max-vw-100">
+                <img src="{{product.thumbnailUrl}}" class="img-fluid rounded-start" alt="...">
+            </div>
+            <div class="col-md-6 d-flex">
+                <div class="card-body d-flex">
+                    <div class="row">
+                        <h5>{{product.name}}</h5>
+                        <app-price class="align-self-end" [price]="product.price"/>
                     </div>
+                    <a routerLink="/product/{{product.id}}" class="stretched-link"></a>
                 </div>
             </div>
         </div>
-    </a>
+    </div>
 }

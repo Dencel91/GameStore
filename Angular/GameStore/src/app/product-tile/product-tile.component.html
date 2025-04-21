@@ -1,16 +1,8 @@
 @if (product) {
 <div class="card">
-    <a routerLink="/product/{{product.id}}">
-        <img src="{{product.thumbnailUrl}}" class="card-img-top img-placeholder">
-    </a>
-    <div>
-        @if(product.price === 0){
-        Free
-        }
-        @else {
-        {{product.price | currency}}
-        }
-    </div>
+    <img src="{{product.thumbnailUrl}}" class="card-img-top img-placeholder">
+    <app-price [price]="product.price"/>
+    <a routerLink="/product/{{product.id}}" class="stretched-link"></a>
 </div>
 }
 @else {

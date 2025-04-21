@@ -10,10 +10,11 @@ import { Cart } from '../interfaces/cart';
 import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
 import { LoadingComponent } from "../loading/loading.component";
+import { NoContentMessageComponent } from "../no-content-message/no-content-message.component";
 
 @Component({
   selector: 'app-product-page',
-  imports: [NgbCarouselModule, AddToCartModalComponent, CommonModule, LoadingComponent, LoadingComponent],
+  imports: [NgbCarouselModule, AddToCartModalComponent, CommonModule, LoadingComponent, LoadingComponent, NoContentMessageComponent],
   templateUrl: './product-page.component.html',
   styleUrl: './product-page.component.css'
 })

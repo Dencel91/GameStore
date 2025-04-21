@@ -1,4 +1,4 @@
-<app-loading [loading]="loading" loadingClass="position-absolute top-50 start-50 translate-middle">
+<app-loading [loading]="loading">
     @if(cart && cart.products.length > 0) {
         <div class="container">
             <br>
@@ -22,6 +22,6 @@
         </div>
     }
     @else {
-        <h1 class="position-absolute top-50 start-50 translate-middle">Your cart is empty.</h1>
+        <app-no-content-message>Your cart is empty.</app-no-content-message>
     }
 </app-loading>

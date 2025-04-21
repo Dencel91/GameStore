@@ -1,20 +1,17 @@
 @if(product) {
 <div class="card mb-3">
     <div class="row g-0">
-        <div class="col-lg-6 col-md-6  max-vw-100">
+        <div class="col-md-6  max-vw-100">
             <img src="{{product.thumbnailUrl}}" class="img-fluid rounded-start" alt="...">
         </div>
-        <div class="col-lg-6 col-md-6 d-flex">
+        <div class="col-md-6 d-flex">
             <div class="card-body flex-fill d-flex">
                 <div class="row align-items-end flex-fill">
                     <h5 class="align-self-start">{{product.name}}</h5>
                     <div class="col d-flex align-items-end">
-                        @if(product.price === 0){
-                        <p style="margin-bottom:5px">Free</p>
-                        }
-                        @else {
-                        <p style="margin-bottom:5px">${{product.price}}</p>
-                        }
+                        <p style="margin-bottom:5px">
+                            <app-price [price]="product.price"/>
+                        </p>
                     </div>
                     <div class="col d-flex align-items-end justify-content-end">
                         <button type="button" class="btn btn-secondary"
