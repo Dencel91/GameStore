@@ -14,6 +14,13 @@ spec:
   - host: dencel.com
     http:
       paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: angular-clusterip-service
+            port:
+              number: 80
       - path: /api/products
         pathType: Prefix
         backend:
