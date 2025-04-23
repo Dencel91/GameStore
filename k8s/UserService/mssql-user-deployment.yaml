@@ -12,13 +12,20 @@ spec:
       labels:
         app: mssql-user
     spec:
+      initContainers:
+      - name: fix-permissions
+        image: busybox
+        command: ["sh", "-c", "chown -R 10001:0 /var/opt/mssql/data"]
+        volumeMounts:
+        - name: mssqldb-user
+          mountPath: /var/opt/mssql/data
       containers:
       - name: mssql-user
         image: mcr.microsoft.com/mssql/server:2019-latest
-        resources:
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
+        # resources:
+        #   limits:
+        #     memory: "512Mi"
+        #     cpu: "500m"
         ports:
         - containerPort: 1433
         env:
@@ -56,6 +63,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mssql-user-loadbalancer-service
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
 spec:
   type: LoadBalancer
   selector:

@@ -3,9 +3,9 @@ kind: Ingress
 metadata:
   name: ingress-service
   annotations:
-    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/use-regexp: "true"
 spec:
+  ingressClassName: nginx
   tls:
   - hosts:
     - dencel.com

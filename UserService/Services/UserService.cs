@@ -1,4 +1,5 @@
-﻿using GameStore.Common.Helpers;
+﻿using AutoMapper;
+using GameStore.Common.Helpers;
 using UserService.Data;
 using UserService.DataServices.Grpc;
 using UserService.Dtos;
@@ -11,12 +12,18 @@ namespace UserService.Services
         private readonly IUserRepo _userRepo;
         private readonly IProductDataClient _productClient;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMapper _mapper;
 
-        public UserService(IUserRepo userRepo, IProductDataClient productClient, IHttpContextAccessor httpContextAccessor)
+        public UserService(
+            IUserRepo userRepo,
+            IProductDataClient productClient,
+            IHttpContextAccessor httpContextAccessor,
+            IMapper mapper)
         {
             _userRepo = userRepo;
             _productClient = productClient;
             _httpContextAccessor = httpContextAccessor;
+            _mapper = mapper;
         }
 
         public async Task<User> GetCurrentUser()
@@ -38,14 +45,10 @@ namespace UserService.Services
 
         public async Task<User> AddUser(AddUserRequest createUserRequest)
         {
-            var user = new User
-            {
-                Id = createUserRequest.Id,
-                Name = createUserRequest.Name
-            };
+            var user = _mapper.Map<User>(createUserRequest);
 
             await _userRepo.CreateUser(user);
-            _userRepo.SaveChanges();
+            await _userRepo.SaveChanges();
 
             return user;
         }

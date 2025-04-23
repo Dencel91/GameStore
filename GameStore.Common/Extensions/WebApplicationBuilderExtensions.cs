@@ -54,7 +54,7 @@ public static class WebApplicationBuilderExtensions
             {
                 options.AddPolicy(CorsPolicies.Production, policy =>
                 {
-                    policy.WithOrigins("http://localhost:4200")
+                    policy.WithOrigins("https://www.game-store-dencel.com")
                         .AllowAnyHeader()
                         .AllowAnyMethod();
                 });

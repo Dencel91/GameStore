@@ -1,0 +1,40 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-eks
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+          - path: /api/products
+            pathType: Prefix
+            backend:
+              service:
+                name: product-service
+                port:
+                  number: 8080
+          - path: /api/users
+            pathType: Prefix
+            backend:
+              service:
+                name: user-clusterip-service
+                port:
+                  number: 8080
+          - path: /api/carts
+            pathType: Prefix
+            backend:
+              service:
+                name: cart-clusterip-service
+                port:
+                  number: 8080
+          - path: /api/auth
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-clusterip-service
+                port:
+                  number: 8080

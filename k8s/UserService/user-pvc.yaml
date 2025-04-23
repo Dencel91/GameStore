@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mssql-auth-claim
+  name: mssql-user-claim
 spec:
   accessModes:
     - ReadWriteOnce

@@ -64,6 +64,12 @@
                     <button class="btn btn-primary w-100" type="submit">Sign up</button>
                 </div>
             </form>
+
+            @if(error) {
+                <div class="alert alert-danger mt-3 text-center" role="alert">
+                    {{error}}
+                </div>
+            }
         </div>
     </div>
 </div>

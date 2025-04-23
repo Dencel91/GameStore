@@ -13,6 +13,8 @@ export class SignUpComponent {
 
   constructor(private authService: AuthService, private router: Router) { }
 
+  error: string = '';
+
   get username() {
     return this.signUpForm.get('userName');
   }
@@ -52,8 +54,18 @@ export class SignUpComponent {
       this.signUpForm.value.email!,
       this.signUpForm.value.password!,
       this.signUpForm.value.checkPassword!)
-      .subscribe(() => {
-        this.router.navigate(['/login']);
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/login']);
+        },
+        error: (error) => {
+          if (error.status === 400 && typeof error.error.detail === 'string') {
+            this.error = error.error.detail;
+          }
+          else {
+            console.error(error);
+          }
+        }
       });
   };
 }

@@ -15,7 +15,7 @@ declare const google: any;
 export class LoginPageComponent {
   constructor(private router: Router, private authService: AuthService) { }
 
-  googleClientId: string = '1025391897494-kcsdhm4qvkftht1amto3h4qtd1vh0tmk.apps.googleusercontent.com';
+  googleClientId: string = '956787144564-1b0cbsa63v7anv2qo2c6fn5rf8ev8i6r.apps.googleusercontent.com';
   error: string = '';
 
   loginForm = new FormGroup({
@@ -71,11 +71,11 @@ export class LoginPageComponent {
         this.router.navigate(['/store']);
       }),
       error: ((error) => {
-        if (error.status === 400 && typeof error.error === 'string') {
-          this.error = error.error;
+        if (error.status === 400 && typeof error.error.detail === 'string') {
+          this.error = error.error.detail;
         }
         else {
-          console.log(error);
+          console.error(error);
         }
       })
     });

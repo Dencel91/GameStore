@@ -62,7 +62,7 @@ public class EventProcessor : IEventProcessor
 
     }
 
-    private Task<User> AddUser(string message)
+    private async Task<User> AddUser(string message)
     {
         var userRegisteredEvent = JsonSerializer.Deserialize<UserRegisteredEvent>(message) ??
             throw new ArgumentException("Can not deserialize a message", nameof(message));
@@ -79,7 +79,8 @@ public class EventProcessor : IEventProcessor
                 Email = userRegisteredEvent.Email
             };
 
-            return userService.AddUser(request);
+            var user = await userService.AddUser(request);
+            return user;
         }
         catch (Exception ex)
         {
