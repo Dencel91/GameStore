@@ -2,3 +2,10 @@
   max-width: 420px;
   width: 100%;
 }
+
+.google-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100% !important;
+}

@@ -50,7 +50,7 @@ export class LoginPageComponent {
   triggerGoogleSignIn() {
     google.accounts.id.renderButton(
       document.getElementById("googleSignIn") as HTMLElement,
-      { theme: "filled_black", text: "continue_with", size: "large", width: "400px" }
+      { theme: "filled_black", text: "continue_with", size: "large", width: "300px" }
     );
   }
 
