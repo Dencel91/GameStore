@@ -70,6 +70,7 @@ Checkout is demo‑only; no real payment captured.
   It displays mock data, and game installation is intentionally not supported.
 
   ![library](https://github.com/user-attachments/assets/1cc231a8-b3ba-44ae-9232-a90f4f203cc5)
+  ![image](https://github.com/user-attachments/assets/9f591807-3145-4cbf-a2bb-b5702a917073)
 </details>
 
 <details>
