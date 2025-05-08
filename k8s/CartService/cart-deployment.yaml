@@ -19,8 +19,11 @@ spec:
         image: dencel2/cart-service:latest
         resources:
           limits:
-            memory: "512Mi"
-            cpu: "500m"
+            memory: "128Mi"
+            cpu: "200m"
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
         env:
         - name: RabbitMq-UserName
           valueFrom:

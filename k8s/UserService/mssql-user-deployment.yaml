@@ -22,10 +22,13 @@ spec:
       containers:
       - name: mssql-user
         image: mcr.microsoft.com/mssql/server:2019-latest
-        # resources:
-        #   limits:
-        #     memory: "512Mi"
-        #     cpu: "500m"
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+          requests:
+            memory: "512Mi"
+            cpu: "100m"
         ports:
         - containerPort: 1433
         env:
