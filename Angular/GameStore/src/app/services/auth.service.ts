@@ -79,13 +79,19 @@ export class AuthService {
       }));
   }
 
-  refreshToken() : Observable<any> {
+  refreshToken(allowRedirect: boolean = true) : Observable<any> {
     const request = {
       userId: this.userId,
       RefreshToken: this.getRefreshToken()
     };
 
-    return this.http.post(this.url + '/refresh-token', request).pipe(
+    const options = {
+      headers: {
+        'Allow-Redirect': allowRedirect ? 'true' : 'false'
+      }
+    };
+
+    return this.http.post(this.url + '/refresh-token', request, options).pipe(
       map((response: any) => {
         this.setAuthInfo(response);
         return response;

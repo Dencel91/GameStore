@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Caching.Distributed;
 using ProductService.Data;
 using ProductService.DTOs;
 using ProductService.Models;
 using ProductService.Models.enums;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ProductService.Services;
 
@@ -15,19 +18,27 @@ public class ProductService : IProductService
     private readonly IMapper _mapper;
     private readonly Lazy<IFileService> _fileService;
     private readonly AppDbContext _dbContext;
+    private readonly IDistributedCache _cache;
 
-    public ProductService(
+    private static readonly JsonSerializerOptions serializerOptions = new JsonSerializerOptions
+    {
+        ReferenceHandler = ReferenceHandler.IgnoreCycles
+    };
+
+public ProductService(
         IProductRepo productRepo,
         IProductReviewRepo productReviewRepo,
         IMapper mapper,
         Lazy<IFileService> fileService,
-        AppDbContext dbContext)
+        AppDbContext dbContext,
+        IDistributedCache cache)
     {
         _productRepo = productRepo;
         _productReviewRepo = productReviewRepo;
         _mapper = mapper;
         _fileService = fileService;
         _dbContext = dbContext;
+        _cache = cache;
     }
 
     public async Task<GetProductsResponse> GetPagedProducts(int pageCursor, int pageSize)
@@ -37,25 +48,68 @@ public class ProductService : IProductService
             pageSize = DefaultPageSize;
         }
 
-        var products = await _productRepo.GetPagedProducts(pageCursor, pageSize);
+        var key = $"product-page-{pageCursor}-{pageSize}";
 
-        var response = new GetProductsResponse
+        var cachedProductPage = await _cache.GetStringAsync(key);
+
+        IEnumerable<Product> products;
+
+        if (string.IsNullOrEmpty(cachedProductPage))
         {
-            Products = _mapper.Map<IEnumerable<ProductDto>>(products),
-            NextPageCursor = products.Any() ? products.Last().Id : 0
-        };
+            products = await _productRepo.GetPagedProducts(pageCursor, pageSize);
 
-        return response;
+            var response = new GetProductsResponse
+            {
+                Products = _mapper.Map<IEnumerable<ProductDto>>(products),
+                NextPageCursor = products.Any() ? products.Last().Id : 0
+            };
+
+            await _cache.SetStringAsync(
+                key,
+                JsonSerializer.Serialize(response),
+                new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                });
+
+            return response;
+        }
+        
+        return JsonSerializer.Deserialize<GetProductsResponse>(cachedProductPage);
     }
 
-    public Task<Product?> GetProduct(int id)
+    public async Task<Product?> GetProduct(int id)
     {
         if (id <= 0)
         {
             throw new ArgumentException("Invalid product id");
         }
 
-        return _productRepo.GetProduct(id);
+        var key = $"product-{id}";
+
+        var cachedProduct = await _cache.GetStringAsync(key);
+
+        if (string.IsNullOrEmpty(cachedProduct))
+        {
+            var product = await _productRepo.GetProduct(id);
+
+            if (product is null)
+            {
+                return null;
+            }
+
+            await _cache.SetStringAsync(
+                key,
+                JsonSerializer.Serialize(product),
+                new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                });
+
+            return product;
+        }
+
+        return JsonSerializer.Deserialize<Product>(cachedProduct);
     }
 
     public async Task<IEnumerable<Product>> SearchProduct(string searchText)
@@ -236,25 +290,33 @@ public class ProductService : IProductService
 
     public async Task<Product?> GetProductDetails(int id)
     {
-        //var product = await _productRepo.GetProduct(id);
-        var product = await _productRepo.GetProductDetails(id);
+        var key = $"product-detail-{id}";
 
-        if (product is null)
+        var cachedProduct = await _cache.GetStringAsync(key);
+
+        if (string.IsNullOrEmpty(cachedProduct))
         {
-            return null;
+            var product = await _productRepo.GetProductDetails(id);
+
+            if (product is null)
+            {
+                return null;
+            }
+
+            product.Reviews = await _productReviewRepo.GetReviewsByProductId(id);
+
+            await _cache.SetStringAsync(
+                key,
+                JsonSerializer.Serialize(product, serializerOptions),
+                new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                });
+
+            return product;
         }
 
-        //var images = product.Images;
-
-        //var getImagesTask = _productImageRepo.GetImagesByProductId(id);
-        product.Reviews = await _productReviewRepo.GetReviewsByProductId(id);
-
-        //Task.WaitAll([getImagesTask, getReviewsTask]);
-
-        //product.Images = getImagesTask.Result;
-        //product.Reviews = getReviewsTask.Result;
-
-        return product;
+        return JsonSerializer.Deserialize<Product>(cachedProduct);
     }
 
     public async Task<ProductReview> CreateProductReview(CreateProductReviewRequest request)

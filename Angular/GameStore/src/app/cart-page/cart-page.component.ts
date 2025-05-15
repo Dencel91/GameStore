@@ -24,11 +24,16 @@ export class CartPageComponent {
     console.log('Cart page loaded');
 
     if (this.cartService.cartId) {
-      this.cartService.GetCart().subscribe((data: Cart) => {
-        console.log('Cart items:', data);
-        this.cart = data;
-        this.loading = false;
-      });
+        this.cartService.GetCart().subscribe({
+          next:(data: Cart) => {
+            console.log('Cart items:', data);
+            this.cart = data;
+            this.loading = false;
+          },
+          error: (error) => {
+            this.loading = false;
+          }
+        });
     }
     else {
       this.loading = false;

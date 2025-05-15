@@ -45,7 +45,7 @@ export class UserService {
   }
 
   getUserProductInfo(productId: number): Observable<any> {
-    const headers = new HttpHeaders({ 'No-Redirect': 'true' });
+    const headers = new HttpHeaders({ 'Allow-Redirect': 'false' });
 
     const options = {headers};
     return this.httpClient.get(this.url + '/products/' + productId, options);

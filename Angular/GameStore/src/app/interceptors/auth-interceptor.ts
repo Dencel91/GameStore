@@ -28,8 +28,10 @@ export class AuthInterceptor implements HttpInterceptor {
 
   private handleAuthError(req: HttpRequest<any>, next: HttpHandler, error: HttpErrorResponse): Observable<HttpEvent<any>> {
     if (error.status === 401) {
+      const allowRedirect = req.headers.get('Allow-Redirect') === null || req.headers.get('Allow-Redirect') === 'true';
+
       if (!this.authService.getRefreshToken()) {
-        if (!req.headers.has('No-Redirect')) {
+        if (allowRedirect) {
           this.router.navigate(["/login"]);
         }
         
@@ -39,20 +41,21 @@ export class AuthInterceptor implements HttpInterceptor {
       if (req.url.endsWith('refresh-token')) {
         this.authService.logout();
 
-        if (!req.headers.has('No-Redirect')) {
+        if (allowRedirect) {
           this.router.navigate(["/login"]);
         }
         
         return throwError(() => error);
       }
 
-      return this.authService.refreshToken().pipe(
+      return this.authService.refreshToken(allowRedirect).pipe(
         switchMap((response: { accessToken: string }) => {
           const cloned = req.clone({
             headers: req.headers.set("Authorization", `Bearer ${response.accessToken}`)
           });
           return next.handle(cloned);
-        }));
+        })
+      );
     } else if (error.status === 403) {
       console.error("Forbidden request", error);
     } else {

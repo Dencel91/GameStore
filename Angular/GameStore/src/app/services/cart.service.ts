@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Cart } from '../interfaces/cart';
-import { map, Observable } from 'rxjs';
+import { catchError, map, Observable, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 
@@ -76,6 +76,13 @@ export class CartService {
       map((cart: Cart) => {
         this.setCart(cart);
         return cart;
+      }),
+      catchError(error => {
+        if (error.status === 404) {
+          this.removeCart();
+        }
+
+        return throwError(() => error);
       })
     );
   }

@@ -2,7 +2,6 @@ using GameStore.Common.Constants;
 using GameStore.Common.Extensions;
 using GameStore.Common.Infrastructure;
 using ProductService.Data;
-using ProductService.DataServices;
 using ProductService.DataServices.Grpc;
 using ProductService.EventProcessing;
 using ProductService.Extensions;
@@ -21,6 +20,11 @@ builder.Services.AddScoped<IProductReviewRepo, ProductReviewRepo>();
 builder.Services.AddTransient(typeof(Lazy<>), typeof(LazyResolver<>));
 builder.Services.AddScoped<IProductService, ProductService.Services.ProductService>();
 builder.Services.AddScoped<IFileService, AzureFileService>();
+
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration["RedisConnection"];
+});
 
 builder.Services.AddGrpc();
 
