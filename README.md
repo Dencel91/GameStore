@@ -9,7 +9,7 @@ A hobby project that re‑creates the core flow of a digital game store (think S
 | Layer    | Tech                                                  |
 |----------|-------------------------------------------------------|
 | Frontend | **Angular 17**, Bootstrap 5                           |
-| Backend  | **.NET 9**, MSSQL, RabbitMQ, gRPC                     |
+| Backend  | **.NET 9**, MSSQL, RabbitMQ, gRPC, Redis              |
 | Runtime  | Docker, Kubernetes (EKS)                              |
 | Storage  | Azure Blob Storage (for images)                       |
 
@@ -18,7 +18,7 @@ A hobby project that re‑creates the core flow of a digital game store (think S
 ## Architecture highlights
 
 * Polyglot **micro‑services** orchestrated by **Kubernetes**.  
-* Services talk via **RabbitMQ (event bus)** and **gRPC** where low‑latency is required.  
+* Services talk via **RabbitMQ (event bus)** and **gRPC** where low‑latency is required.
 * Stateless REST + JWT auth; Google OAuth for social sign‑in.  
 * CDN‑ready static site hosted in an S3‑style bucket; images off‑loaded to Azure Blob.  
 
